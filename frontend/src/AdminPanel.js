@@ -4,6 +4,10 @@ import './AdminDashboard.css';
 import MenuItemModal from './components/MenuItemModal';
 import ConfirmModal from './components/ConfirmModal';
 
+// Set the backend URL directly
+const API_BASE_URL = 'https://swp-backend-x36i.onrender.com';
+axios.defaults.baseURL = API_BASE_URL;
+
 function AdminPanel() {
   // JWT-based admin auth (token stored in localStorage; axios header set)
   // Helper to get token from localStorage
