@@ -3,8 +3,8 @@ services:
   - type: web
     name: swp-backend
     env: node
-    buildCommand: npm install
-    startCommand: npm start
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
     envVars:
       - key: NODE_ENV
         value: production
@@ -12,7 +12,7 @@ services:
         value: 10000
       - key: MONGODB_URI
         value: mongodb+srv://roobiinpandey_db_user:Nepal1590@sandwichplus.yabntey.mongodb.net/swpdb
-      - key: SECRET_KEY
+      - key: JWT_SECRET
         generateValue: true
     
   # Frontend service  
