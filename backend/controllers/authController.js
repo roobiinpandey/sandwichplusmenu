@@ -21,7 +21,8 @@ exports.login = async (req, res) => {
     if (!user) return res.status(401).json({ error: 'Invalid credentials' });
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ error: 'Invalid credentials' });
-    const token = jwt.sign({ userId: user._id, role: user.role }, process.env.SECRET_KEY, { expiresIn: '1d' });
+    const jwtSecret = process.env.SECRET_KEY || process.env.JWT_SECRET || 'default-jwt-secret-for-development-only-change-in-production';
+    const token = jwt.sign({ userId: user._id, role: user.role }, jwtSecret, { expiresIn: '1d' });
     // Set HttpOnly cookie so browser-based clients can send the token automatically
     res.cookie('token', token, {
       httpOnly: true,
@@ -41,7 +42,8 @@ exports.verifyToken = (req, res, next) => {
   // Fallback to cookie token if present (browser clients)
   if (!token && req.cookies && req.cookies.token) token = req.cookies.token;
   if (!token) return res.status(401).json({ error: 'No token provided' });
-  jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
+  const jwtSecret = process.env.SECRET_KEY || process.env.JWT_SECRET || 'default-jwt-secret-for-development-only-change-in-production';
+  jwt.verify(token, jwtSecret, (err, user) => {
     if (err) return res.status(403).json({ error: 'Invalid token' });
     req.user = user;
     next();
