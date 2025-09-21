@@ -7,6 +7,8 @@ import ConfirmModal from './components/ConfirmModal';
 // Set the backend URL directly
 const API_BASE_URL = 'https://swp-backend-x36i.onrender.com';
 axios.defaults.baseURL = API_BASE_URL;
+// Configure axios for credentials but don't use withCredentials since we're using Authorization headers
+axios.defaults.withCredentials = false;
 
 function AdminPanel() {
   // JWT-based admin auth (token stored in localStorage; axios header set)
@@ -35,10 +37,12 @@ function AdminPanel() {
 
   useEffect(() => {
     // If token exists in localStorage, set axios header
-  // enable sending cookies
-  axios.defaults.withCredentials = true;
-  // Fetch menu and categories
-  axios.get('/menu', { headers: getAuthHeaders() }).then(res => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    }
+    // Fetch menu and categories
+    axios.get('/menu', { headers: getAuthHeaders() }).then(res => {
       setCategories(res.data.categories.map(cat => cat.name_en));
       const items = res.data.categories.flatMap(cat => cat.items.map(item => ({ ...item, category: cat.name_en })));
       setMenu(items);
@@ -47,14 +51,14 @@ function AdminPanel() {
 
   useEffect(() => {
     if (activeTab === 'orders') {
-  axios.get('/orders', { headers: getAuthHeaders() }).then(res => setOrders(res.data));
+      axios.get('/orders', { headers: getAuthHeaders() }).then(res => setOrders(res.data));
     }
   }, [activeTab]);
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('/auth/login', { username: loginId, password: menuPassword }, { withCredentials: true });
+      const res = await axios.post('/auth/login', { username: loginId, password: menuPassword });
       if (res.status === 200 && res.data && res.data.token) {
         localStorage.setItem('authToken', res.data.token);
         axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`;
@@ -75,11 +79,11 @@ function AdminPanel() {
 
   const handleLogout = async () => {
     // logout via POST so server clears cookie
-  try { await axios.post('/auth/logout', {}, { withCredentials: true, headers: getAuthHeaders() }); } catch (e) {}
-  localStorage.removeItem('authToken');
-  axios.defaults.headers.common['Authorization'] = '';
-  setMenuAccessGranted(false);
-  window.location.reload();
+    try { await axios.post('/auth/logout', {}, { headers: getAuthHeaders() }); } catch (e) {}
+    localStorage.removeItem('authToken');
+    axios.defaults.headers.common['Authorization'] = '';
+    setMenuAccessGranted(false);
+    window.location.reload();
   };
 
   const handleSearch = (e) => setSearchTerm(e.target.value);
