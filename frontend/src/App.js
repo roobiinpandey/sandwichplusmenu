@@ -12,8 +12,8 @@ import PlaceOrderModal from './PlaceOrderModal';
 import OrderSuccessModal from './OrderSuccessModal';
 
 // Configure axios base URL for API calls - Updated for new backend URL
-const API_BASE_URL = process.env.REACT_APP_API_URL || 
-  (process.env.NODE_ENV === 'production' ? 'https://swp-backend-x36i.onrender.com' : 'http://localhost:3001');
+const API_BASE_URL = 'https://swp-backend-x36i.onrender.com';
+console.log('Using API Base URL:', API_BASE_URL);
 axios.defaults.baseURL = API_BASE_URL;
 
 function App() {
