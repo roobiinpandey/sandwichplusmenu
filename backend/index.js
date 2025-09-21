@@ -5,6 +5,7 @@ require('./models/Order');
 require('./models/MenuItem');
 require('./models/Counter');
 require('./models/User');
+require('./models/Category');
 // Import routes
 const ordersRoutes = require('./routes/orders');
 const menuRoutes = require('./routes/menu');
@@ -60,6 +61,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(bodyParser.json());
+
+// Basic root endpoint
+app.get('/', (req, res) => res.json({ message: 'SWP Backend API is running' }));
 
 // lightweight health check
 app.get('/ping', (req, res) => res.json({ ok: true }));
