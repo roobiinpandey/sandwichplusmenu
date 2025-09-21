@@ -170,13 +170,9 @@ if (!fs.existsSync(imagesDir)) {
   fs.mkdirSync(imagesDir);
 }
 
-// Mongoose Schemas
-// Category Schema
-const CategorySchema = new mongoose.Schema({
-  name_en: String,
-  name_ar: String
-});
-const Category = mongoose.model('Category', CategorySchema);
+// Mongoose Schemas - using models from separate files
+// Category model is defined in ./models/Category.js
+const Category = mongoose.model('Category');
 // Order model is defined in ./models/Order.js
 const Order = mongoose.model('Order');
 
