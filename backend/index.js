@@ -10,7 +10,7 @@ console.log('NODE_ENV:', process.env.NODE_ENV);
 app.get('/', (req, res) => {
   console.log('Root endpoint hit');
   res.json({ 
-    message: 'SWP Backend is working!', 
+    message: 'SWP Backend is working! v2', 
     port: PORT,
     env: process.env.NODE_ENV 
   });
