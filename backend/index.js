@@ -418,6 +418,32 @@ app.put('/menu/:id', authenticateToken, upload.single('image'), async (req, res)
 // Serve images statically
 app.use('/images', express.static(imagesDir));
 
+// Temporary endpoint to fix missing categories
+app.get('/fix-categories', async (req, res) => {
+  try {
+    const categories = await MenuItem.find().distinct('category');
+    const created = [];
+    
+    for (const catName of categories) {
+      if (catName) {
+        const existingCat = await Category.findOne({ name_en: catName });
+        if (!existingCat) {
+          const newCategory = new Category({
+            name_en: catName,
+            name_ar: catName // Default to English name
+          });
+          await newCategory.save();
+          created.push(catName);
+        }
+      }
+    }
+    
+    res.json({ success: true, created, message: `Created ${created.length} categories` });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fix categories', details: err.message });
+  }
+});
+
 // Debug endpoint to show all categories and menu items (moved here so models exist)
 app.get('/debug-menu', async (req, res) => {
   try {
