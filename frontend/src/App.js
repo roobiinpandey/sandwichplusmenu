@@ -9,10 +9,12 @@ import MenuPage from './MenuPage';
 import PDVWrapper from './PDVWrapper';
 import OrderSummaryModal from './OrderSummaryModal';
 import PlaceOrderModal from './PlaceOrderModal';
+import OrderSuccessModal from './OrderSuccessModal';
 
 // Configure axios base URL for API calls
-axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
-import OrderSuccessModal from './OrderSuccessModal';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 
+  (process.env.NODE_ENV === 'production' ? 'https://swp-backend.onrender.com' : 'http://localhost:3001');
+axios.defaults.baseURL = API_BASE_URL;
 
 function App() {
 	// Health status badge and all state/hooks
