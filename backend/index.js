@@ -520,7 +520,19 @@ MenuItem.countDocuments().then(count => {
       description_en: 'Hot coffee',
       description_ar: 'قهوة ساخنة'
     });
-    sampleItem.save().then(() => console.log('Sample menu item added'));
+    sampleItem.save().then(() => {
+      console.log('Sample menu item added');
+      // Also create the category
+      Category.countDocuments({ name_en: 'Beverages' }).then(catCount => {
+        if (catCount === 0) {
+          const sampleCategory = new Category({
+            name_en: 'Beverages',
+            name_ar: 'المشروبات'
+          });
+          sampleCategory.save().then(() => console.log('Sample category added'));
+        }
+      });
+    });
   }
 });
 
@@ -536,6 +548,23 @@ User.countDocuments({ username: 'admin' }).then(count => {
       adminUser.save().then(() => console.log('Sample admin user added'));
     });
   }
+});
+
+// Ensure categories exist for all menu items (one-time fix)
+MenuItem.find().distinct('category').then(categories => {
+  categories.forEach(async (catName) => {
+    if (catName) {
+      const existingCat = await Category.findOne({ name_en: catName });
+      if (!existingCat) {
+        const newCategory = new Category({
+          name_en: catName,
+          name_ar: catName // Default to English name, can be updated later
+        });
+        await newCategory.save();
+        console.log(`Created missing category: ${catName}`);
+      }
+    }
+  });
 });
 
 const PORT = process.env.PORT || 3001;
