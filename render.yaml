@@ -23,4 +23,4 @@ services:
     staticPublishPath: ./frontend/build
     envVars:
       - key: REACT_APP_API_URL
-        value: https://swp-backend.onrender.com
+        value: https://swp-backend-x36i.onrender.com

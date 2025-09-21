@@ -13,7 +13,7 @@ import OrderSuccessModal from './OrderSuccessModal';
 
 // Configure axios base URL for API calls
 const API_BASE_URL = process.env.REACT_APP_API_URL || 
-  (process.env.NODE_ENV === 'production' ? 'https://swp-backend.onrender.com' : 'http://localhost:3001');
+  (process.env.NODE_ENV === 'production' ? 'https://swp-backend-x36i.onrender.com' : 'http://localhost:3001');
 axios.defaults.baseURL = API_BASE_URL;
 
 function App() {
