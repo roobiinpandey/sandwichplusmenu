@@ -444,6 +444,37 @@ app.get('/fix-categories', async (req, res) => {
   }
 });
 
+// Temporary endpoint to setup new categories
+app.get('/setup-new-categories', async (req, res) => {
+  try {
+    // Delete all existing categories
+    await Category.deleteMany({});
+    
+    // Add new categories
+    const newCategories = [
+      { name_en: "Breakfast Plus", name_ar: "الإفطار زائد" },
+      { name_en: "International Plus", name_ar: "الدولية بلس" },
+      { name_en: "Oriental Plus", name_ar: "اورينتال بلس" },
+      { name_en: "Pasta Plus", name_ar: "باستا بلس" },
+      { name_en: "Meal Plus", name_ar: "وجبة بلس" },
+      { name_en: "Hot & Cold Drinks", name_ar: "المشروبات الساخنة والباردة" },
+      { name_en: "Pastry", name_ar: "معجنات" },
+      { name_en: "Sandwich", name_ar: "شطيرة" }
+    ];
+    
+    const created = [];
+    for (const catData of newCategories) {
+      const newCategory = new Category(catData);
+      await newCategory.save();
+      created.push(catData.name_en);
+    }
+    
+    res.json({ success: true, created, message: `Created ${created.length} new categories` });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to setup categories', details: err.message });
+  }
+});
+
 // Debug endpoint to show all categories and menu items (moved here so models exist)
 app.get('/debug-menu', async (req, res) => {
   try {
