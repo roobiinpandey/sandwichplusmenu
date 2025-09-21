@@ -9,6 +9,9 @@ import MenuPage from './MenuPage';
 import PDVWrapper from './PDVWrapper';
 import OrderSummaryModal from './OrderSummaryModal';
 import PlaceOrderModal from './PlaceOrderModal';
+
+// Configure axios base URL for API calls
+axios.defaults.baseURL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
 import OrderSuccessModal from './OrderSuccessModal';
 
 function App() {
