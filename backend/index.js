@@ -42,9 +42,25 @@ app.use((req, res, next) => {
 });
 
 // CORS and JSON body parsing must be applied before route definitions
+const allowedOrigins = [
+  'http://localhost:3000', 
+  'http://localhost:3001',
+  'https://swp-frontend.onrender.com',
+  'https://sandwichplusmenu.onrender.com'  // In case you use a custom domain
+];
+
 app.use(cors({
-  // Allow both frontend dev server (3000) and backend (3001) for convenience during development
-  origin: ['http://localhost:3000', 'http://localhost:3001'],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+    return callback(new Error(msg), false);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
