@@ -2,9 +2,9 @@
   "name": "swp-backend",
   "version": "1.0.0",
   "description": "SWP Food Ordering Backend",
-  "main": "backend/index.js",
+  "main": "backend/simple-test.js",
   "scripts": {
-    "start": "node backend/index.js"
+    "start": "node backend/simple-test.js"
   },
   "keywords": [],
   "author": "",
