@@ -126,8 +126,8 @@ app.post('/auth/register',
 applySecurity(app);
 // Use modular routes
 app.use('/orders', ordersRoutes);
-// Mount legacy menu item router on a different path to avoid conflict with the curated /menu endpoint
-app.use('/menu', menuRoutes);
+// Note: /menu routes are defined directly in this file to avoid conflicts
+// app.use('/menu', menuRoutes); // Commented out to prevent route conflicts
 app.use('/auth', authRoutes);
 app.use(healthRoutes);
 
