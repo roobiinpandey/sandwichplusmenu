@@ -11,9 +11,7 @@ services:
       - key: PORT
         value: 10000
       - key: MONGODB_URI
-        fromDatabase:
-          name: swp-mongodb
-          property: connectionString
+        value: mongodb+srv://roobiinpandey_db_user:Nepal1590@sandwichplus.yabntey.mongodb.net/swpdb
       - key: SECRET_KEY
         generateValue: true
     
@@ -26,8 +24,3 @@ services:
     envVars:
       - key: REACT_APP_API_URL
         value: https://swp-backend.onrender.com
-
-databases:
-  - name: swp-mongodb
-    databaseName: swpdb
-    user: swpuser
