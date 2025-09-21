@@ -133,20 +133,33 @@ app.use(healthRoutes);
 
 // MongoDB connection using environment variable
 const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/swpdb';
-console.log('Connecting to MongoDB at', mongoUri);
-mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
+console.log('Connecting to MongoDB at', mongoUri.replace(/\/\/([^:]+):([^@]+)@/, '//$1:***@')); // Hide password in logs
+
+// Connect to MongoDB with modern connection options
+mongoose.connect(mongoUri)
+  .then(() => {
+    console.log('Connected to MongoDB successfully');
+    // Ensure counters collection has a TTL index on expireAt for automatic cleanup
+    try {
+      const adminDb = mongoose.connection.db;
+      adminDb.collection('counters').createIndex({ expireAt: 1 }, { expireAfterSeconds: 0 });
+      console.log('Ensured TTL index on counters.expireAt');
+    } catch (e) {
+      console.log('Failed to ensure TTL index on counters:', e.message);
+    }
+  })
+  .catch((error) => {
+    console.error('MongoDB connection error:', error);
+    process.exit(1); // Exit if cannot connect to database
+  });
+
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-db.once('open', () => {
-  console.log('Connected to MongoDB');
-  // Ensure counters collection has a TTL index on expireAt for automatic cleanup
-  try {
-    const adminDb = mongoose.connection.db;
-    adminDb.collection('counters').createIndex({ expireAt: 1 }, { expireAfterSeconds: 0 });
-    console.log('Ensured TTL index on counters.expireAt');
-  } catch (e) {
-    console.log('Failed to ensure TTL index on counters:', e.message);
-  }
+db.on('disconnected', () => {
+  console.log('MongoDB disconnected');
+});
+db.on('reconnected', () => {
+  console.log('MongoDB reconnected');
 });
 
 const imagesDir = path.join(__dirname, 'images');
@@ -528,6 +541,32 @@ User.countDocuments({ username: 'admin' }).then(count => {
 });
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+
+// Add error handling for server startup
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`✅ Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`✅ Server ready to accept connections`);
+});
+
+server.on('error', (error) => {
+  console.error('❌ Server startup error:', error);
+  process.exit(1);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully');
+  server.close(() => {
+    mongoose.connection.close();
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully');
+  server.close(() => {
+    mongoose.connection.close();
+    process.exit(0);
+  });
 });
