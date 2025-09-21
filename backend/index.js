@@ -131,6 +131,9 @@ app.use('/menu', menuRoutes);
 app.use('/auth', authRoutes);
 app.use(healthRoutes);
 
+// Set mongoose configuration
+mongoose.set('strictQuery', false); // Suppress deprecation warning
+
 // MongoDB connection using environment variable
 const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/swpdb';
 console.log('Connecting to MongoDB at', mongoUri.replace(/\/\/([^:]+):([^@]+)@/, '//$1:***@')); // Hide password in logs
