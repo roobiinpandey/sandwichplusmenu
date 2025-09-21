@@ -1,0 +1,312 @@
+/* Blurred background overlay for order details dialog */
+.order-dialog-blur {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background: rgba(30, 50, 40, 0.18);
+	backdrop-filter: blur(6px);
+	z-index: 99998;
+}
+/* Order Details Dialog Styles */
+.order-details-dialog {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 99999;
+	border: none;
+	background: transparent;
+	padding: 0;
+	width: 100%;
+	max-width: 420px;
+}
+.order-dialog-card {
+	background: #fff;
+	border-radius: 18px;
+	box-shadow: 0 8px 32px rgba(42,92,69,0.18);
+	border: 3px solid #176c3a;
+	padding: 0 0 18px 0;
+	width: 100%;
+	min-width: 280px;
+	max-width: 420px;
+	margin: 0 auto;
+	animation: fadeInDialog 0.2s;
+}
+@keyframes fadeInDialog {
+	from { opacity: 0; transform: scale(0.96); }
+	to { opacity: 1; transform: scale(1); }
+}
+.order-dialog-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 18px 22px 8px 22px;
+	border-bottom: 1px solid #f2f2f2;
+}
+.order-dialog-title {
+	font-size: 1.3rem;
+	font-weight: 900;
+	color: var(--primary);
+}
+.order-dialog-badge {
+	background: linear-gradient(90deg,#ffb347,#ffcc80 80%);
+	color: #fff;
+	font-weight: 700;
+	font-size: 1rem;
+	border-radius: 8px;
+	padding: 4px 12px;
+	margin-left: 8px;
+}
+.order-dialog-close {
+	background: none;
+	border: none;
+	font-size: 1.5rem;
+	color: #888;
+	cursor: pointer;
+	font-weight: 900;
+	transition: color 0.2s;
+}
+.order-dialog-close:hover {
+	color: #d32f2f;
+}
+.order-dialog-body {
+	padding: 18px 22px 0 22px;
+}
+.order-dialog-row {
+	margin-bottom: 10px;
+	font-size: 1.05rem;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.order-dialog-items {
+	list-style: none;
+	padding: 0;
+	margin: 10px 0 0 0;
+}
+.order-dialog-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 10px 12px;
+	margin-bottom: 8px;
+	background: linear-gradient(90deg,#e8f5e9 80%,#f6fff7 100%);
+	border: 2px solid #176c3a;
+	border-radius: 10px;
+	font-size: 1rem;
+	box-shadow: 0 2px 8px rgba(23,108,58,0.08);
+}
+.order-dialog-item-price {
+	font-weight: 700;
+	color: var(--primary);
+	margin-left: 12px;
+}
+.order-dialog-total {
+	font-size: 1.15rem;
+	font-weight: 900;
+	color: var(--accent);
+	margin-top: 18px;
+}
+.order-dialog-footer {
+	display: flex;
+	justify-content: flex-end;
+	padding: 0 22px;
+	margin-top: 10px;
+}
+.order-dialog-close-btn {
+	background: linear-gradient(90deg,#5661f6,#2a8de6);
+	color: #fff;
+	border: none;
+	border-radius: 8px;
+	padding: 10px 18px;
+	font-weight: 700;
+	font-size: 1rem;
+	cursor: pointer;
+	box-shadow: 0 2px 8px rgba(76,175,80,0.10);
+	transition: background 0.2s;
+}
+.order-dialog-close-btn:hover {
+	background: linear-gradient(90deg,#2ecc71,#20b15a);
+}
+@media (max-width: 600px) {
+	.order-details-dialog {
+		max-width: 98vw;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
+	.order-dialog-card {
+		max-width: 98vw;
+		min-width: 0;
+		padding: 0 0 12px 0;
+	}
+	.order-dialog-header, .order-dialog-body, .order-dialog-footer {
+		padding-left: 10px;
+		padding-right: 10px;
+	}
+}
+/* Orange highlight for new orders */
+.order-card.new-order {
+	background: linear-gradient(90deg,#ffb347,#ffcc80 80%) !important;
+	box-shadow: 0 4px 18px rgba(255, 165, 0, 0.18) !important;
+	border: 2px solid #ffa726 !important;
+	transition: background 0.3s, box-shadow 0.3s;
+}
+/* Dashboard styles - previously AdminDashboard.css */
+@import url('./App.css');
+
+/* Add your dashboard-specific styles below */
+
+/* Configurable theme variables (override in :root or parent theme) */
+:root {
+	--order-new-color: #ff8a00; /* default orange for new/received orders */
+	--order-new-glow: rgba(255,138,0,0.08);
+}
+
+/* ...existing styles from AdminDashboard.css... */
+
+/* Order card base */
+.order-card {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	/* Revised Dashboard visuals */
+
+	/* Orders grid and cards */
+	.orders-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		gap: 18px;
+	}
+
+	.order-card {
+		background: linear-gradient(180deg, #ffffff, #fbfbfd);
+		border-radius: 14px;
+		padding: 18px;
+		border: 1px solid rgba(15,20,40,0.04);
+		box-shadow: 0 6px 30px rgba(16,24,40,0.06);
+		transition: transform 220ms ease, box-shadow 220ms ease;
+	}
+	.order-card:hover { transform: translateY(-6px); box-shadow: 0 12px 40px rgba(16,24,40,0.09); }
+
+	/* New/received order highlight (orange) until completed */
+	.order-card-new {
+		border-left: 6px solid var(--order-new-color);
+		box-shadow: 0 10px 30px var(--order-new-glow);
+	}
+
+	/* To override the color project-wide, add to your global styles or index.css:
+		 :root { --order-new-color: #f59e0b; --order-new-glow: rgba(245,158,11,0.08); }
+	*/
+
+	.order-status-badge {
+		position: absolute;
+		top: 14px;
+		right: 14px;
+		padding: 6px 12px;
+		border-radius: 999px;
+		font-weight: 800;
+		font-size: 12px;
+		color: #fff;
+		letter-spacing: 0.6px;
+		box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+	}
+	.badge-completed { background: linear-gradient(90deg,#2ecc71,#2aa46a); }
+	.badge-new { background: linear-gradient(90deg,#ff8a00,#ff6b00); }
+	.badge-other { background: linear-gradient(90deg,#5b8cfa,#3a66e6); }
+
+	/* Header inside card */
+	.order-card .order-id { font-weight: 700; color: var(--primary); font-size: 1rem; }
+	.order-card .order-date { color: var(--text-light); font-size: 0.9rem; margin-top: 6px; }
+
+	/* Order items list */
+	.order-card .order-items { margin-top: 12px; display: grid; gap: 8px; }
+	.order-card .order-items .order-item { display:flex; justify-content:space-between; align-items:center; padding:10px; background: #fff; border-radius:8px; border:1px solid rgba(15,20,40,0.03); }
+
+	/* Totals bar */
+	.order-card .order-total { background: linear-gradient(90deg,var(--primary), #2a8de6); color: #fff; padding: 12px; border-radius: 10px; display:flex; justify-content:space-between; align-items:center; margin-top:12px; }
+
+	/* Buttons */
+	.order-card button { border: none; padding: 10px 14px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+	.order-card .view-details-btn{ background: linear-gradient(90deg,#5661f6,#2a8de6); color:#fff; }
+	.order-card .mark-completed-btn{ background: linear-gradient(90deg,#2ecc71,#20b15a); color:#fff; }
+
+	/* Dialog item tweaks to match admin dialog */
+	.admin-login-dialog .modal-items { padding-left: 18px; margin-top: 8px; }
+	.admin-login-dialog .modal-items li { margin-bottom: 8px; font-size: 14px }
+
+	/* Responsive tweaks */
+	@media (max-width: 720px) {
+		.orders-grid { grid-template-columns: 1fr; }
+		.order-card { padding: 14px; }
+		.admin-login-dialog { width: calc(100% - 24px); }
+	}
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.mark-completed-btn:hover { opacity: 0.95; }
+
+.action-msg {
+	position: fixed;
+	top: 96px;
+	right: 20px;
+	background: rgba(0,0,0,0.8);
+	color: #fff;
+	padding: 8px 12px;
+	border-radius: 8px;
+	z-index: 140;
+}
+
+/* Modal styles */
+.modal-backdrop {
+	position: fixed;
+	left: 0; right: 0; top: 0; bottom: 0;
+	background: rgba(0,0,0,0.25);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 200;
+}
+.modal {
+	background: #fff;
+	padding: 12px 14px;
+	border-radius: 10px;
+	width: 360px;
+	max-width: calc(100% - 40px);
+	box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+}
+.modal h3 { margin-top: 0; }
+
+.modal-header {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.modal-title { font-weight: 600; font-size: 14px; }
+
+.order-badge {
+	background: #ff8a00;
+	color: #fff;
+	padding: 4px 8px;
+	border-radius: 12px;
+	font-size: 13px;
+	font-weight: 700;
+}
+
+.modal-close {
+	background: transparent;
+	border: none;
+	font-size: 16px;
+	line-height: 1;
+	cursor: pointer;
+	color: #444;
+}
+
+.modal .modal-items { padding-left: 18px; margin: 6px 0 }
+.modal .modal-items li { margin-bottom: 6px; font-size: 13px }
+
+/* header login inputs */
+/* header token input uses inline styles; no extra rules needed */

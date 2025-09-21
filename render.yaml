@@ -1,0 +1,33 @@
+services:
+  # Backend service
+  - type: web
+    name: swp-backend
+    env: node
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        fromDatabase:
+          name: swp-mongodb
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+    
+  # Frontend service  
+  - type: web
+    name: swp-frontend
+    env: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/build
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://swp-backend.onrender.com
+
+databases:
+  - name: swp-mongodb
+    databaseName: swpdb
+    user: swpuser

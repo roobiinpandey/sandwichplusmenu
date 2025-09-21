@@ -1,0 +1,15 @@
+/* Small backend status badge */
+.backend-status {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 9999;
+  padding: 6px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+.backend-status.online { background: #2d9c2b; }
+.backend-status.offline { background: #d9534f; }

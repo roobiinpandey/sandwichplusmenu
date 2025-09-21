@@ -1,0 +1,585 @@
+[
+  {
+    "customer": "Robin",
+    "items": [
+      {
+        "id": "1",
+        "name_en": "Chicken Club Sandwich",
+        "name_ar": "ساندويتش دجاج كلوب",
+        "price": 27,
+        "quantity": 1,
+        "size": "Large"
+      }
+    ],
+    "total": 27,
+    "time": "2025-09-06T13:21:36.209Z",
+    "status": "completed",
+    "id": "1757164896221"
+  },
+  {
+    "customer": "asim",
+    "items": [
+      {
+        "id": "1",
+        "name_en": "Chicken Club Sandwich",
+        "name_ar": "ساندويتش دجاج كلوب",
+        "price": 22,
+        "quantity": 1,
+        "size": "Regular"
+      }
+    ],
+    "total": 22,
+    "time": "2025-09-06T13:23:10.063Z",
+    "status": "completed",
+    "id": "1757164990067"
+  },
+  {
+    "customer": "kjkn",
+    "items": [
+      {
+        "id": "1",
+        "name_en": "Chicken Club Sandwich",
+        "name_ar": "ساندويتش دجاج كلوب",
+        "price": 22,
+        "quantity": 1,
+        "size": "Regular"
+      },
+      {
+        "id": "3",
+        "name_en": "Fresh Orange Juice",
+        "name_ar": "عصير برتقال طازج",
+        "price": 12,
+        "quantity": 1,
+        "size": "Small"
+      }
+    ],
+    "total": 34,
+    "time": "2025-09-06T19:19:10.757Z",
+    "status": "completed",
+    "id": "1757186350776"
+  },
+  {
+    "customer": "Robin",
+    "items": [
+      {
+        "id": "1",
+        "name_en": "Chicken Club Sandwich",
+        "name_ar": "ساندويتش دجاج كلوب",
+        "price": 22,
+        "quantity": 1,
+        "size": "Regular"
+      },
+      {
+        "id": "1",
+        "name_en": "Chicken Club Sandwich",
+        "name_ar": "ساندويتش دجاج كلوب",
+        "price": 27,
+        "quantity": 3,
+        "size": "Large"
+      },
+      {
+        "id": "3",
+        "name_en": "Fresh Orange Juice",
+        "name_ar": "عصير برتقال طازج",
+        "price": 17,
+        "quantity": 1,
+        "size": "Large"
+      }
+    ],
+    "total": 120,
+    "time": "2025-09-06T19:59:57.823Z",
+    "status": "completed",
+    "id": "1757188797828"
+  },
+  {
+    "customer": "sandip",
+    "items": [
+      {
+        "id": "1",
+        "name_en": "Chicken Club Sandwich",
+        "name_ar": "ساندويتش دجاج كلوب",
+        "price": 22,
+        "quantity": 5,
+        "size": "Regular"
+      }
+    ],
+    "total": 110,
+    "time": "2025-09-06T20:00:46.430Z",
+    "status": "completed",
+    "id": "1757188846434"
+  },
+  {
+    "customer": "Robin",
+    "items": [
+      {
+        "id": "1",
+        "name_en": "Chicken Club Sandwich",
+        "name_ar": "ساندويتش دجاج كلوب",
+        "price": 22,
+        "quantity": 3,
+        "size": "Regular"
+      }
+    ],
+    "total": 66,
+    "time": "2025-09-06T20:10:23.527Z",
+    "status": "completed",
+    "id": "1757189423541"
+  },
+  {
+    "customer": "Laxmi",
+    "items": [
+      {
+        "id": "1",
+        "name_en": "Chicken Club Sandwich",
+        "name_ar": "ساندويتش دجاج كلوب",
+        "price": 22,
+        "quantity": 1,
+        "size": "Regular"
+      },
+      {
+        "id": "1",
+        "name_en": "Chicken Club Sandwich",
+        "name_ar": "ساندويتش دجاج كلوب",
+        "price": 27,
+        "quantity": 1,
+        "size": "Large"
+      }
+    ],
+    "total": 49,
+    "time": "2025-09-06T20:15:01.313Z",
+    "status": "completed",
+    "id": "1757189701316"
+  },
+  {
+    "customer": "marvin",
+    "items": [
+      {
+        "id": "1",
+        "name_en": "Chicken Club Sandwich",
+        "name_ar": "ساندويتش دجاج كلوب",
+        "price": 22,
+        "quantity": 9,
+        "size": "Regular"
+      }
+    ],
+    "total": 198,
+    "time": "2025-09-06T20:18:51.461Z",
+    "status": "completed",
+    "id": "1757189931464"
+  },
+  {
+    "customer": "Rose",
+    "items": [
+      {
+        "id": "1",
+        "name_en": "Chicken Club Sandwich",
+        "name_ar": "ساندويتش دجاج كلوب",
+        "price": 22,
+        "quantity": 1,
+        "size": "Regular"
+      }
+    ],
+    "total": 22,
+    "time": "2025-09-06T20:19:56.494Z",
+    "status": "completed",
+    "id": "1757189996498"
+  },
+  {
+    "customer": "John",
+    "items": [
+      {
+        "id": "1",
+        "name_en": "Chicken Club Sandwich",
+        "name_ar": "ساندويتش دجاج كلوب",
+        "price": 22,
+        "quantity": 3,
+        "size": "Regular"
+      }
+    ],
+    "total": 66,
+    "time": "2025-09-06T21:39:49.403Z",
+    "status": "completed",
+    "id": "1757194789418"
+  },
+  {
+    "customer": "sun",
+    "items": [
+      {
+        "id": "1757195216315",
+        "name_en": "Tuna Sandwich",
+        "price": 18,
+        "quantity": 1,
+        "size": null
+      }
+    ],
+    "total": 18,
+    "time": "2025-09-06T21:50:23.599Z",
+    "status": "completed",
+    "id": "1757195423605"
+  },
+  {
+    "customer": "robin",
+    "items": [
+      {
+        "id": "1757204798926",
+        "name_en": "Avocado",
+        "name_ar": "فطور قاري",
+        "price": 25,
+        "quantity": 1,
+        "size": null
+      }
+    ],
+    "total": 25,
+    "time": "2025-09-07T00:53:28.670Z",
+    "status": "completed",
+    "id": "1757206408688"
+  },
+  {
+    "customer": "Moon",
+    "items": [
+      {
+        "id": "1757204798926",
+        "name_en": "Avocado",
+        "name_ar": "فطور قاري",
+        "price": 25,
+        "quantity": 1,
+        "size": ""
+      }
+    ],
+    "total": 25,
+    "time": "2025-09-07T14:06:22.634Z",
+    "status": "Pending",
+    "id": "1757253982638"
+  },
+  {
+    "customer": "Time ",
+    "items": [
+      {
+        "id": "1757204798926",
+        "name_en": "Avocado",
+        "name_ar": "فطور قاري",
+        "price": 25,
+        "quantity": 1,
+        "size": ""
+      }
+    ],
+    "total": 25,
+    "time": "2025-09-07T14:09:02.423Z",
+    "status": "Pending",
+    "id": "1757254142441"
+  },
+  {
+    "customer": "RobinPandey",
+    "items": [
+      {
+        "id": "1757204798926",
+        "name_en": "Avocado",
+        "name_ar": "فطور قاري",
+        "price": 25,
+        "quantity": 1,
+        "size": ""
+      }
+    ],
+    "total": 25,
+    "time": "2025-09-07T14:10:42.074Z",
+    "status": "Pending",
+    "id": "1757254242078"
+  },
+  {
+    "customer": "zdgd",
+    "items": [
+      {
+        "id": "1757204798926",
+        "name_en": "Avocado",
+        "name_ar": "فطور قاري",
+        "price": 25,
+        "quantity": 1,
+        "size": ""
+      }
+    ],
+    "total": 25,
+    "time": "2025-09-07T14:12:20.535Z",
+    "status": "Pending",
+    "id": "1757254340538"
+  },
+  {
+    "customer": "timetime",
+    "items": [
+      {
+        "id": "1757204798926",
+        "name_en": "Avocado",
+        "name_ar": "فطور قاري",
+        "price": 25,
+        "quantity": 1,
+        "size": ""
+      }
+    ],
+    "total": 25,
+    "time": "2025-09-07T14:12:53.745Z",
+    "status": "completed",
+    "id": "1757254373749"
+  },
+  {
+    "customer": "ronin Pandet",
+    "items": [
+      {
+        "id": "1757204798926",
+        "name_en": "Avocado",
+        "name_ar": "فطور قاري",
+        "price": 25,
+        "quantity": 1,
+        "size": ""
+      }
+    ],
+    "total": 25,
+    "time": "2025-09-07T14:15:46.918Z",
+    "status": "completed",
+    "id": "1757254546922"
+  },
+  {
+    "customer": "Hamdan",
+    "items": [
+      {
+        "id": "1757263528568",
+        "name_en": "Falafel \"vegetarian\"",
+        "name_ar": "فطور قاري",
+        "price": 18,
+        "quantity": 1,
+        "size": ""
+      }
+    ],
+    "total": 18,
+    "time": "2025-09-07T17:02:22.798Z",
+    "status": "completed",
+    "id": "1757264542811"
+  },
+  {
+    "customer": "Antion",
+    "items": [
+      {
+        "id": "1757266331060",
+        "name_en": "Omlette",
+        "name_ar": " فطور قاري",
+        "price": 16,
+        "quantity": 1,
+        "size": ""
+      }
+    ],
+    "total": 16,
+    "time": "2025-09-07T18:42:24.664Z",
+    "status": "completed",
+    "id": "1757270544668"
+  },
+  {
+    "customer": "sandwich",
+    "items": [
+      {
+        "id": "1757263528568",
+        "name_en": "Falafel \"vegetarian\"",
+        "name_ar": "فطور قاري",
+        "price": 18,
+        "quantity": 1,
+        "size": ""
+      }
+    ],
+    "total": 18,
+    "time": "2025-09-07T18:44:12.499Z",
+    "status": "completed",
+    "id": "1757270652503"
+  },
+  {
+    "customer": "Macbook",
+    "items": [
+      {
+        "id": "1757262975924",
+        "name_en": "Halloumi",
+        "name_ar": "فطور قاري",
+        "price": 22,
+        "quantity": 1,
+        "size": ""
+      }
+    ],
+    "total": 22,
+    "time": "2025-09-07T18:52:44.036Z",
+    "status": "Pending",
+    "id": "1757271164040"
+  },
+  {
+    "customer": "Windows",
+    "items": [
+      {
+        "id": "1757262975924",
+        "name_en": "Halloumi",
+        "name_ar": "فطور قاري",
+        "price": 22,
+        "quantity": 1,
+        "size": ""
+      }
+    ],
+    "total": 22,
+    "time": "2025-09-07T18:54:26.519Z",
+    "status": "Pending",
+    "id": "1757271266523"
+  },
+  {
+    "customer": "SandwichPlus",
+    "items": [
+      {
+        "id": "1757263528568",
+        "name_en": "Falafel \"vegetarian\"",
+        "name_ar": "فطور قاري",
+        "price": 18,
+        "quantity": 1,
+        "size": ""
+      }
+    ],
+    "total": 18,
+    "time": "2025-09-07T20:47:49.008Z",
+    "status": "completed",
+    "id": "1757278069027"
+  },
+  {
+    "customer": "Nepal",
+    "items": [
+      {
+        "id": "1757263528568",
+        "name_en": "Falafel \"vegetarian\"",
+        "name_ar": "فطور قاري",
+        "price": 18,
+        "quantity": 1,
+        "size": ""
+      }
+    ],
+    "total": 18,
+    "time": "2025-09-07T22:06:54.119Z",
+    "status": "completed",
+    "id": "1757282814139"
+  },
+  {
+    "customer": "Roast",
+    "items": [
+      {
+        "id": "1757283026278",
+        "name_en": "Baguette Beef Roast",
+        "name_ar": "ساندويتش دجاج كلوب",
+        "price": 22,
+        "quantity": 3,
+        "size": ""
+      }
+    ],
+    "total": 66,
+    "time": "2025-09-07T22:11:06.543Z",
+    "status": "completed",
+    "id": "1757283066547"
+  },
+  {
+    "customer": "Falafel",
+    "items": [
+      {
+        "id": "1757263528568",
+        "name_en": "Falafel \"vegetarian\"",
+        "name_ar": "فطور قاري",
+        "price": 18,
+        "quantity": 1,
+        "size": ""
+      }
+    ],
+    "total": 18,
+    "time": "2025-09-07T22:11:41.796Z",
+    "status": "completed",
+    "id": "1757283101800"
+  },
+  {
+    "customer": "Rose",
+    "items": [
+      {
+        "id": "1757262494943",
+        "name_en": "TUNA",
+        "name_ar": "فطور قاري",
+        "price": 22,
+        "quantity": 1,
+        "size": ""
+      }
+    ],
+    "total": 22,
+    "time": "2025-09-08T06:36:02.405Z",
+    "status": "completed",
+    "id": "1757313362424"
+  },
+  {
+    "customer": "sasank",
+    "items": [
+      {
+        "id": "1757263528568",
+        "name_en": "Falafel \"vegetarian\"",
+        "name_ar": "فطور قاري",
+        "price": 18,
+        "quantity": 1,
+        "size": ""
+      }
+    ],
+    "total": 18,
+    "time": "2025-09-08T09:00:38.317Z",
+    "status": "Pending",
+    "id": "1757322038343"
+  },
+  {
+    "customer": "JD",
+    "items": [
+      {
+        "id": "1757262975924",
+        "name_en": "Halloumi",
+        "name_ar": "فطور قاري",
+        "price": 22,
+        "quantity": 1,
+        "size": ""
+      }
+    ],
+    "total": 22,
+    "time": "2025-09-08T09:17:21.916Z",
+    "status": "Pending",
+    "id": "1757323041937"
+  },
+  {
+    "customer": "asmi",
+    "items": [
+      {
+        "id": "1757263528568",
+        "name_en": "Falafel \"vegetarian\"",
+        "name_ar": "فطور قاري",
+        "price": 18,
+        "quantity": 1,
+        "size": ""
+      }
+    ],
+    "total": 18,
+    "time": "2025-09-08T09:36:59.047Z",
+    "status": "Pending",
+    "id": "1757324219068"
+  },
+  {
+    "customer": "Cathren",
+    "items": [
+      {
+        "id": "1757262975924",
+        "name_en": "Halloumi",
+        "name_ar": "فطور قاري",
+        "price": 22,
+        "quantity": 2,
+        "size": ""
+      },
+      {
+        "id": "1757263528568",
+        "name_en": "Falafel \"vegetarian\"",
+        "name_ar": "فطور قاري",
+        "price": 18,
+        "quantity": 1,
+        "size": ""
+      }
+    ],
+    "total": 62,
+    "time": "2025-09-10T09:01:27.007Z",
+    "status": "completed",
+    "id": "1757494887028"
+  }
+]

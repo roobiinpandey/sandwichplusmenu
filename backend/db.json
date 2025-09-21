@@ -1,0 +1,7 @@
+{
+  "menu": [
+    { "id": 1, "name": "Margherita Pizza", "price": 25 },
+    { "id": 2, "name": "Veggie Burger", "price": 18 },
+    { "id": 3, "name": "Pasta Alfredo", "price": 22 }
+  ]
+}

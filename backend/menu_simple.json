@@ -1,0 +1,48 @@
+[
+  {
+    "name_en": "BREAKFAST",
+    "name_ar": "الفطور",
+    "items": [
+      {
+        "name_en": "Avocado",
+        "name_ar": "فطور قاري",
+        "price": 25,
+        "category": "BREAKFAST",
+        "subcategory": "BREAKFAST",
+        "description_en": "Avocado is a Breakfast Plus dish made with avocado, boiled egg, cherry tomato. It is light, fresh, and energizing, perfect for any occasion or meal. Enjoy the taste and texture that make it unique!",
+        "description_ar": "مخبوزات متنوعة، فواكه طازجة، زبادي، وقهوة أو شاي",
+        "id": "1757262204714",
+        "images": ["/images/9d2cbf717fee0d491df82029f058acf9"]
+      },
+      {
+        "name_en": "TUNA",
+        "name_ar": "فطور قاري",
+        "price": 22,
+        "category": "BREAKFAST",
+        "subcategory": "BREAKFAST",
+        "description_en": "Assorted pastries, fresh fruits, yogurt, and coffee or tea",
+        "description_ar": "مخبوزات متنوعة، فواكه طازجة، زبادي، وقهوة أو شاي",
+        "id": "1757262494943",
+        "images": ["/images/93e308d0938100e634be8c7129e4a63a"]
+      }
+      
+    ]
+  },
+  {
+    "name_en": "SANDWICH PLUS",
+    "name_ar": "ساندويتش بلس",
+    "items": [
+      {
+        "name_en": "Baguette Beef Roast",
+        "name_ar": "ساندويتش دجاج كلوب",
+        "price": 22,
+        "category": "SANDWICH PLUS",
+        "subcategory": "SANDWICH PLUS",
+        "description_en": "Grilled chicken breast, crispy bacon, lettuce, tomato, and mayo on toasted bread",
+        "description_ar": "صدر دجاج مشوي، لحم خنزير مقدد مقرمش، خس، طماطم، ومايونيز على خبز محمص",
+        "id": "1757283026278",
+        "images": ["/images/18d1848dd0215ab57afde5b07d663063"]
+      }
+    ]
+  }
+]
