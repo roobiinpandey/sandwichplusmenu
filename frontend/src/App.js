@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './App.css';
 import axios from 'axios';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 import Dashboard from './Dashboard';
 import AdminMenuItemDetail from './AdminMenuItemDetail';
 import AdminPanel from './AdminPanel';
