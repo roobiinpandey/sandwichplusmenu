@@ -125,8 +125,8 @@ app.post('/auth/register',
 applySecurity(app);
 // Use modular routes
 app.use('/orders', ordersRoutes);
-// Note: /menu routes are defined directly in this file to avoid conflicts
-// app.use('/menu', menuRoutes); // Commented out to prevent route conflicts
+// Enable menu routes for POST operations (adding/editing menu items)
+app.use('/menu', menuRoutes);
 app.use('/auth', authRoutes);
 app.use(healthRoutes);
 
@@ -192,17 +192,18 @@ const upload = multer({
 });
 
 // Secure menu/category endpoints
-app.get('/menu', async (req, res) => {
-  try {
-    const categories = await Category.find().lean();
-    for (const cat of categories) {
-      cat.items = await MenuItem.find({ category: cat.name_en }).lean();
-    }
-    res.json({ categories });
-  } catch (err) {
-    res.status(500).json({ error: 'Menu not found' });
-  }
-});
+// GET /menu route is now handled by menu router
+// app.get('/menu', async (req, res) => {
+//   try {
+//     const categories = await Category.find().lean();
+//     for (const cat of categories) {
+//       cat.items = await MenuItem.find({ category: cat.name_en }).lean();
+//     }
+//     res.json({ categories });
+//   } catch (err) {
+//     res.status(500).json({ error: 'Menu not found' });
+//   }
+// });
 
 
 // Use categories router

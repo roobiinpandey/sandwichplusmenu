@@ -3,6 +3,7 @@ const router = express.Router();
 const MenuItem = require('../models/MenuItem');
 const multer = require('multer');
 const path = require('path');
+const { verifyToken } = require('../controllers/authController');
 
 // Setup multer for image upload
 const storage = multer.diskStorage({
@@ -61,7 +62,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST /menu - add a new menu item (supports multipart/form-data)
-router.post('/', upload.single('image'), async (req, res) => {
+router.post('/', verifyToken, upload.single('image'), async (req, res) => {
     // Robustly parse has_sizes and sizes
     const hasSizes = req.body.has_sizes === 'true' || req.body.has_sizes === true;
     let sizes = [];
