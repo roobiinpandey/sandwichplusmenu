@@ -59,9 +59,9 @@ function MenuItemModal({ mode, item, onClose, onSuccess, categories }) {
       const token = localStorage.getItem('authToken');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       if (mode === 'add') {
-        await axios.post('/menu', submitData, { withCredentials: true, headers });
+        await axios.post('/menu', submitData, { headers });
       } else {
-        await axios.put(`/menu/${item.id}`, submitData, { withCredentials: true, headers });
+        await axios.put(`/menu/${item.id}`, submitData, { headers });
       }
       setShowSuccess(true);
       setTimeout(() => {

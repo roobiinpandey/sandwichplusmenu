@@ -15,6 +15,7 @@ import OrderSuccessModal from './OrderSuccessModal';
 const API_BASE_URL = 'https://swp-backend-x36i.onrender.com';
 console.log('Using API Base URL:', API_BASE_URL);
 axios.defaults.baseURL = API_BASE_URL;
+axios.defaults.withCredentials = false;
 
 function App() {
 	// Health status badge and all state/hooks
