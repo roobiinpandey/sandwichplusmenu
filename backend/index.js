@@ -67,15 +67,16 @@ app.get('/', (req, res) => res.json({ message: 'SWP Backend API is running' }));
 
 // lightweight health check
 app.get('/ping', (req, res) => res.json({ ok: true }));
-app.get('/health', async (req, res) => {
-  try {
-    // Optionally check DB connection
-    const dbStatus = (mongoose.connection.readyState === 1) ? 'connected' : 'disconnected';
-    res.json({ status: 'ok', db: dbStatus });
-  } catch (e) {
-    res.status(500).json({ status: 'error', error: e.message });
-  }
-});
+// Note: /health route is handled by healthRoutes router
+// app.get('/health', async (req, res) => {
+//   try {
+//     // Optionally check DB connection
+//     const dbStatus = (mongoose.connection.readyState === 1) ? 'connected' : 'disconnected';
+//     res.json({ status: 'ok', db: dbStatus });
+//   } catch (e) {
+//     res.status(500).json({ status: 'error', error: e.message });
+//   }
+// });
 
 // Use User model compiled in ./models/User.js (required at top)
 const User = mongoose.model('User');
