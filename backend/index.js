@@ -1,9 +1,3 @@
-// ...existing code...
-
-// ...existing code...
-
-// ...existing code...
-
 // Import security and performance middleware
 const applySecurity = require('./middleware/security');
 // Import models (for mongoose connection)
