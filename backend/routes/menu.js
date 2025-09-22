@@ -3,6 +3,7 @@ const router = express.Router();
 const MenuItem = require('../models/MenuItem');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const { verifyToken } = require('../controllers/authController');
 
 // Setup multer for image upload
@@ -112,10 +113,21 @@ router.post('/', verifyToken, upload.single('image'), async (req, res) => {
       return res.status(400).json({ error: 'Missing or invalid sizes for item with sizes' });
     }
 
-    // Handle image upload
+    // Handle image upload - convert to base64 for persistent storage
     let images = [];
     if (req.file) {
-      images.push(`/images/${req.file.filename}`);
+      try {
+        // Read the uploaded file and convert to base64
+        const imageBuffer = fs.readFileSync(req.file.path);
+        const base64Image = `data:${req.file.mimetype};base64,${imageBuffer.toString('base64')}`;
+        images.push(base64Image);
+        
+        // Clean up the temporary file
+        fs.unlinkSync(req.file.path);
+      } catch (error) {
+        console.error('Error processing image:', error);
+        return res.status(500).json({ error: 'Failed to process image' });
+      }
     }
 
     // Generate a unique id if not provided

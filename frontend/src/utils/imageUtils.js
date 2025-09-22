@@ -2,13 +2,18 @@
 const API_BASE_URL = 'https://swp-backend-x36i.onrender.com';
 
 /**
- * Constructs a full image URL from a relative path
- * @param {string} imagePath - The image path from the backend (e.g., "/images/filename.jpg")
- * @returns {string} - The full image URL or a placeholder if no image
+ * Constructs a full image URL from a relative path or returns base64 data URL as-is
+ * @param {string} imagePath - The image path from the backend (e.g., "/images/filename.jpg" or "data:image/jpeg;base64,...")
+ * @returns {string} - The full image URL or the base64 data URL or a placeholder if no image
  */
 export const getImageUrl = (imagePath) => {
   if (!imagePath) {
     return 'https://via.placeholder.com/300x200?text=No+Image';
+  }
+  
+  // If it's a base64 data URL, return as-is
+  if (imagePath.startsWith('data:image/')) {
+    return imagePath;
   }
   
   // If it's already a full URL, return as-is
@@ -29,7 +34,7 @@ export const getImageUrl = (imagePath) => {
  * Gets the image URL from an item's images array
  * @param {object} item - The menu item with images array
  * @param {string} placeholder - Custom placeholder URL (optional)
- * @returns {string} - The full image URL or placeholder
+ * @returns {string} - The full image URL, base64 data URL, or placeholder
  */
 export const getItemImageUrl = (item, placeholder) => {
   const defaultPlaceholder = placeholder || 'https://via.placeholder.com/300x200?text=No+Image';
