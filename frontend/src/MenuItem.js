@@ -5,27 +5,59 @@ const MenuItem = ({ item, lang, onAddToCart, cartQuantity, onChangeQuantity, onS
   const [addedMsg, setAddedMsg] = useState('');
   const [adding, setAdding] = useState(false);
   const addingRef = useRef(false);
+  
   // Size selector state
   const isDrink = item.category && (item.category.toLowerCase().includes('drink') || item.category.toLowerCase().includes('hot') || item.category.toLowerCase().includes('cold'));
   const validSizes = ['small', 'medium', 'large'];
   const availableSizes = Array.isArray(item.sizes) ? item.sizes.filter(sz => validSizes.includes(sz.size?.toLowerCase())) : [];
   const [selectedSize, setSelectedSize] = useState(availableSizes[0]?.size || '');
   const selectedPrice = availableSizes.find(sz => sz.size === selectedSize)?.price || item.price;
+  
+  // Bread selector state for Breakfast Plus items
+  const isBreakfastPlus = item.category === 'Breakfast Plus';
+  const breadOptions = [
+    { en: 'Toast', ar: 'نخب' },
+    { en: 'Baguette', ar: 'الرغيف الفرنسي' },
+    { en: 'Brioche Bun', ar: 'كعكة بريوش' },
+    { en: 'Saj Bread', ar: 'خبز صاج' }
+  ];
+  const [selectedBread, setSelectedBread] = useState('');
+  
   const handleAdd = () => {
     if (addingRef.current) {
       console.debug('[MenuItem] blocked by ref');
       return;
     }
+    
+    // Check if bread selection is required but not selected
+    if (isBreakfastPlus && !selectedBread) {
+      setAddedMsg(lang === 'ar' ? 'يرجى اختيار نوع الخبز أولاً' : 'Please choose your bread first');
+      setTimeout(() => setAddedMsg(''), 3000);
+      return;
+    }
+    
     addingRef.current = true;
     setAdding(true);
     console.debug('[MenuItem] proceeding to add');
     const actionId = `${item.id}-${Date.now()}`;
     console.debug('[MenuItem] trigger add', { itemId: item.id, actionId });
+    
+    // Create item with additional options
+    let itemToAdd = { ...item };
+    if (isBreakfastPlus && selectedBread) {
+      const breadOption = breadOptions.find(b => b.en === selectedBread);
+      itemToAdd.bread = {
+        en: breadOption.en,
+        ar: breadOption.ar
+      };
+      itemToAdd.breadDisplay = lang === 'ar' ? breadOption.ar : breadOption.en;
+    }
+    
     // Pass size and price for drinks
     if (isDrink && selectedSize) {
-      onAddToCart({ ...item, size: selectedSize, price: Number(selectedPrice) }, { quantity: 1, source: 'MenuItem', actionId });
+      onAddToCart({ ...itemToAdd, size: selectedSize, price: Number(selectedPrice) }, { quantity: 1, source: 'MenuItem', actionId });
     } else {
-      onAddToCart(item, { quantity: 1, source: 'MenuItem', actionId });
+      onAddToCart(itemToAdd, { quantity: 1, source: 'MenuItem', actionId });
     }
     setTimeout(() => {
       setAddedMsg(`${lang === 'ar' ? 'تمت إضافة المنتج' : 'Item is added'} (${cartQuantity + 1} ${lang === 'ar' ? 'منتج' : 'item(s)'})`);
@@ -62,13 +94,59 @@ const MenuItem = ({ item, lang, onAddToCart, cartQuantity, onChangeQuantity, onS
             </select>
           </div>
         )}
+        
+        {/* Bread selector for Breakfast Plus items */}
+        {isBreakfastPlus && (
+          <div style={{ marginTop: 8, marginBottom: 4 }}>
+            <label style={{ fontWeight: 600, marginRight: 8, display: 'block', marginBottom: 4 }}>
+              {lang === 'ar' ? 'اختر نوع الخبز:' : 'Choose Your Base Bread:'}
+            </label>
+            <select 
+              value={selectedBread} 
+              onChange={e => setSelectedBread(e.target.value)} 
+              style={{ 
+                padding: '6px 12px', 
+                borderRadius: 6, 
+                border: selectedBread ? '1px solid #2a5c45' : '2px solid #ff6b6b', 
+                fontWeight: 600,
+                width: '100%',
+                backgroundColor: selectedBread ? '#f8f9fa' : '#fff5f5'
+              }}
+            >
+              <option value="">{lang === 'ar' ? 'اختر نوع الخبز' : 'Select Bread Type'}</option>
+              {breadOptions.map(bread => (
+                <option key={bread.en} value={bread.en}>
+                  {lang === 'ar' ? bread.ar : bread.en}
+                </option>
+              ))}
+            </select>
+            {!selectedBread && (
+              <div style={{ fontSize: '0.85rem', color: '#d32f2f', marginTop: 2, fontWeight: 600 }}>
+                {lang === 'ar' ? 'مطلوب' : 'Required'}
+              </div>
+            )}
+          </div>
+        )}
         <div style={{ marginTop: 10 }}>
           <button
-            style={{ background: '#2a5c45', color: '#fff', borderRadius: 6, padding: '6px 16px', fontWeight: 600, border: 'none', cursor: adding ? 'not-allowed' : 'pointer', opacity: adding ? 0.6 : 1 }}
+            style={{ 
+              background: (isBreakfastPlus && !selectedBread) ? '#ccc' : '#2a5c45', 
+              color: '#fff', 
+              borderRadius: 6, 
+              padding: '6px 16px', 
+              fontWeight: 600, 
+              border: 'none', 
+              cursor: (adding || (isBreakfastPlus && !selectedBread)) ? 'not-allowed' : 'pointer', 
+              opacity: (adding || (isBreakfastPlus && !selectedBread)) ? 0.6 : 1,
+              width: '100%'
+            }}
             onClick={e => { e.preventDefault(); e.stopPropagation(); handleAdd(); }}
-            disabled={adding}
+            disabled={adding || (isBreakfastPlus && !selectedBread)}
           >
-            {lang === 'ar' ? 'أضف إلى السلة' : 'Add to Cart'}
+            {(isBreakfastPlus && !selectedBread) 
+              ? (lang === 'ar' ? 'اختر الخبز أولاً' : 'Choose Bread First')
+              : (lang === 'ar' ? 'أضف إلى السلة' : 'Add to Cart')
+            }
           </button>
           {cartQuantity > 0 && (
             <div style={{ marginLeft: 12, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginTop: 8 }}>
