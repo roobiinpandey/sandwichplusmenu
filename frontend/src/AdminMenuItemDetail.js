@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getItemImageUrl } from '../utils/imageUtils';
+import { getItemImageUrl } from './utils/imageUtils';
 import axios from 'axios';
 import './AdminDashboard.css';
 

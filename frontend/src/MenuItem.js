@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { getItemImageUrl } from '../utils/imageUtils';
+import { getItemImageUrl } from './utils/imageUtils';
 
 const MenuItem = ({ item, lang, onAddToCart, cartQuantity, onChangeQuantity, onShowDetail }) => {
   const [addedMsg, setAddedMsg] = useState('');
