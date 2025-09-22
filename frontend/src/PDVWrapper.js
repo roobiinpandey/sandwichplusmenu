@@ -94,7 +94,7 @@ export default function PDVWrapper({ categories, lang, addToCart, openCart, open
           src={getItemImageUrl(product, 'https://via.placeholder.com/540x320?text=No+Image')}
           alt={product.name_en || product.name_ar || product.name}
         />
-        <p className="menu-item-desc">{product.description_en || product.description_ar || ''}</p>
+        <p className="menu-item-desc">{lang === 'ar' ? (product.description_ar || product.description_en || '') : (product.description_en || product.description_ar || '')}</p>
         <div className="price-box">{lang === 'ar' ? 'السعر:' : 'Price:'} <span className="price-bold">AED {product.price}</span></div>
         <div className="detail-actions">
           <button className="add-btn" onClick={handleAddToCart} style={{ background: '#2a5c45', color: '#fff', borderRadius: 6, padding: '10px 24px', fontWeight: 600, border: 'none', fontSize: '1.08rem', cursor: 'pointer' }}>
