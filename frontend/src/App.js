@@ -10,6 +10,7 @@ import PDVWrapper from './PDVWrapper';
 import OrderSummaryModal from './OrderSummaryModal';
 import PlaceOrderModal from './PlaceOrderModal';
 import OrderSuccessModal from './OrderSuccessModal';
+import RestoreCartModal from './RestoreCartModal';
 
 // Configure axios base URL for API calls - Updated for new backend URL
 const API_BASE_URL = 'https://swp-backend-x36i.onrender.com';
@@ -41,10 +42,103 @@ function App() {
 	// Order success state
 	const [orderSuccess, setOrderSuccess] = useState(null);
 
+	// Cart history tracking state
+	const [cartHistory, setCartHistory] = useState([]);
+	const [showRestoreModal, setShowRestoreModal] = useState(false);
+
+	// Save cart state to history with timestamp
+	const saveCartToHistory = (currentCart, action = 'add') => {
+		const historyEntry = {
+			id: Date.now(),
+			timestamp: new Date().toISOString(),
+			cart: JSON.parse(JSON.stringify(currentCart)), // deep copy
+			action,
+			totalItems: currentCart.reduce((sum, item) => sum + item.quantity, 0),
+			totalPrice: currentCart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+		};
+		
+		setCartHistory(prev => {
+			const newHistory = [historyEntry, ...prev];
+			// Keep only last 20 entries to prevent memory issues
+			const trimmedHistory = newHistory.slice(0, 20);
+			
+			// Also save to localStorage for persistence
+			try {
+				localStorage.setItem('cartHistory', JSON.stringify(trimmedHistory));
+			} catch (e) {
+				console.warn('Failed to save cart history to localStorage:', e);
+			}
+			
+			return trimmedHistory;
+		});
+	};
+
+	// Load cart history from localStorage on component mount
+	useEffect(() => {
+		try {
+			const savedHistory = localStorage.getItem('cartHistory');
+			if (savedHistory) {
+				const parsed = JSON.parse(savedHistory);
+				if (Array.isArray(parsed)) {
+					setCartHistory(parsed);
+					return; // History already exists
+				}
+			}
+			
+			// Initialize history with current cart state if no history exists
+			const initialEntry = {
+				id: Date.now(),
+				timestamp: new Date().toISOString(),
+				cart: [],
+				action: 'initial',
+				totalItems: 0,
+				totalPrice: 0
+			};
+			setCartHistory([initialEntry]);
+			localStorage.setItem('cartHistory', JSON.stringify([initialEntry]));
+		} catch (e) {
+			console.warn('Failed to load cart history from localStorage:', e);
+		}
+	}, []);
+
+	// Restore cart to a specific historical state
+	const restoreCartToTime = (historyEntry) => {
+		if (historyEntry && historyEntry.cart) {
+			setOrder(historyEntry.cart);
+			showToast(
+				lang === 'ar' 
+					? `تم استعادة العربة إلى ${new Date(historyEntry.timestamp).toLocaleString('ar')}` 
+					: `Cart restored to ${new Date(historyEntry.timestamp).toLocaleString()}`,
+				'success'
+			);
+			setShowRestoreModal(false);
+			
+			// Save this restore action as a new history entry
+			saveCartToHistory(historyEntry.cart, 'restore');
+		}
+	};
+
 	// Cart handlers
-	const handleRemoveItem = (idx) => setOrder(o => o.filter((_, i) => i !== idx));
-	const handleChangeQuantity = (idx, delta) => setOrder(o => o.map((it, i) => i === idx ? { ...it, quantity: Math.max(1, it.quantity + delta) } : it));
-	const handleClearOrder = () => setOrder([]);
+	const handleRemoveItem = (idx) => {
+		setOrder(prevOrder => {
+			const newOrder = prevOrder.filter((_, i) => i !== idx);
+			saveCartToHistory(newOrder, 'remove');
+			return newOrder;
+		});
+	};
+	
+	const handleChangeQuantity = (idx, delta) => {
+		setOrder(prevOrder => {
+			const newOrder = prevOrder.map((it, i) => i === idx ? { ...it, quantity: Math.max(1, it.quantity + delta) } : it);
+			saveCartToHistory(newOrder, delta > 0 ? 'increase' : 'decrease');
+			return newOrder;
+		});
+	};
+	
+	const handleClearOrder = () => {
+		saveCartToHistory([], 'clear');
+		setOrder([]);
+	};
 
 	const lastAddRef = useRef({ key: null, t: 0 });
 	// Track in-flight add operations to prevent near-simultaneous duplicates
@@ -118,7 +212,7 @@ function App() {
 				newQuantity += existing.quantity;
 			}
 			// Always return a single entry for this product+size+bread, preserving essential properties
-			return [
+			const newCart = [
 				...filtered,
 				{
 					id: product.id,
@@ -134,6 +228,11 @@ function App() {
 					...(product.category && { category: product.category })
 				}
 			];
+			
+			// Save to cart history
+			saveCartToHistory(newCart, 'add');
+			
+			return newCart;
 		});
 	};
 
@@ -250,6 +349,8 @@ function App() {
 								openCart={() => setShowCart(true)}
 								openPlaceOrder={() => setShowPlaceOrder(true)}
 								setLang={setLang}
+								openRestoreCart={() => setShowRestoreModal(true)}
+								hasCartHistory={cartHistory.length > 0}
 							/>
 						} />
 						<Route path="/dashboard" element={<Dashboard />} />
@@ -314,6 +415,13 @@ function App() {
 						customerName={orderSuccess?.customerName}
 						total={orderSuccess?.total || 0}
 						onNewOrder={() => setOrderSuccess(null)}
+					/>
+					<RestoreCartModal
+						show={showRestoreModal}
+						onClose={() => setShowRestoreModal(false)}
+						cartHistory={cartHistory}
+						onRestore={restoreCartToTime}
+						lang={lang}
 					/>
 									   {/* Toast Notification for PlaceOrderModal is now rendered inside PlaceOrderModal */}
 				</>

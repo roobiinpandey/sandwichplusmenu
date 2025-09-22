@@ -22,7 +22,7 @@ function EmptyCartModal({ show, lang, onClose }) {
 }
 
 
-export default function MenuPage({ categories, lang, order, setOrder, addToCart, openCart, openPlaceOrder, setLang }) {
+export default function MenuPage({ categories, lang, order, setOrder, addToCart, openCart, openPlaceOrder, setLang, openRestoreCart, hasCartHistory }) {
   const navigate = useNavigate();
 
   
@@ -298,6 +298,30 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
           <button className="order-btn view-order-btn" onClick={() => setShowCart(true)} style={{ fontWeight: 600, fontSize: '1rem', padding: '10px 0' }}>
             {lang === 'ar' ? 'عرض الطلب بالكامل' : 'View Full Order'}
           </button>
+          
+          {/* Restore Cart Button */}
+          {hasCartHistory && (
+            <button 
+              className="order-btn" 
+              onClick={openRestoreCart}
+              style={{ 
+                fontWeight: 600, 
+                fontSize: '0.9rem', 
+                padding: '8px 0',
+                backgroundColor: '#6c757d',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                transition: 'background-color 0.2s'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#5a6268'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = '#6c757d'}
+            >
+              {lang === 'ar' ? '🕒 استعادة العربة' : '🕒 Restore Cart'}
+            </button>
+          )}
+          
           <button className="order-btn place-order-btn" onClick={() => {
             if (order.length === 0) {
               setShowEmptyCartModal(true);
