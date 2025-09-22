@@ -365,8 +365,13 @@ app.post('/orders',
       }
       return res.json({ success: true, id: savedOrder._id, orderNumber: savedOrder.orderNumber });
     } catch (err) {
-      console.error('Unhandled error in POST /orders:', err && err.message);
-      return res.status(500).json({ error: 'Failed to create order', details: err && err.message });
+      console.error('Unhandled error in POST /orders:', err);
+      console.error('Error name:', err.name);
+      console.error('Error message:', err.message);
+      console.error('Error stack:', err.stack);
+      console.error('Error code:', err.code);
+      console.error('Request body at error:', JSON.stringify(req.body));
+      return res.status(500).json({ error: 'Failed to create order', details: err.message, errorType: err.name });
     }
   }
 );
