@@ -41,15 +41,23 @@ function Dashboard() {
     const fetchOrders = () => {
       const token = localStorage.getItem('token');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      
+      // Add debug logging
+      console.log('[Dashboard] Fetching orders...', new Date().toLocaleTimeString());
+      
       // Always request all orders, not just today's
       axios.get('/orders?all=true', { headers }).then(res => {
         // ensure newest-first by time
         const sorted = (res.data || []).slice().sort((a, b) => new Date(b.time) - new Date(a.time));
         setOrders(sorted);
         const ids = (res.data || []).map(o => o._id);
+        
+        console.log('[Dashboard] Current orders:', ids.length, 'Previous:', prevOrderIds.current.length);
+        
         if (prevOrderIds.current.length && ids.length > prevOrderIds.current.length) {
           const added = ids.filter(id => !prevOrderIds.current.includes(id));
           if (added.length) {
+            console.log('[Dashboard] New orders detected:', added);
             setNewOrderIds(ids => [...ids, ...added]);
             setNewOrderToastIds(ids => [...ids, ...added]);
           }
@@ -266,7 +274,13 @@ function Dashboard() {
         </div>
       )}
       {newOrderToastIds.length > 0 && (
-        <div className="new-order-toast" style={{
+        <div 
+          className="new-order-toast" 
+          onClick={() => {
+            setNewOrderToastIds([]);
+            setNewOrderAnim(false);
+          }}
+          style={{
           position: 'fixed',
           top: 18,
           left: '50%',
@@ -285,10 +299,11 @@ function Dashboard() {
           alignItems: 'center',
           gap: 16,
           border: '2px solid #ffb347',
-          animation: 'popBell 1.2s cubic-bezier(.68,-0.55,.27,1.55)'
+          animation: 'popBell 1.2s cubic-bezier(.68,-0.55,.27,1.55)',
+          cursor: 'pointer'
         }}>
           <span style={{ fontSize: '2.2rem', animation: 'ringBell 1.2s infinite' }} role="img" aria-label="bell">🔔</span>
-          <span>New order received!</span>
+          <span>New order received! (Click to dismiss)</span>
         </div>
       )}
       {/* Add bell ring animation and sound effect */}
