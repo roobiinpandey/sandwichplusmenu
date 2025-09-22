@@ -14,6 +14,15 @@ export default function PDVWrapper({ categories, lang, addToCart, openCart, open
   const { id } = useParams();
   const navigate = useNavigate();
 
+  // Bread selection for Breakfast Plus items
+  const breadOptions = [
+    { en: 'Toast', ar: 'نخب' },
+    { en: 'Baguette', ar: 'الرغيف الفرنسي' },
+    { en: 'Brioche Bun', ar: 'كعكة بريوش' },
+    { en: 'Saj Bread', ar: 'خبز صاج' }
+  ];
+  const [selectedBread, setSelectedBread] = React.useState('');
+
   // Find product by id in categories
   let product = null;
   for (const cat of categories || []) {
@@ -39,8 +48,26 @@ export default function PDVWrapper({ categories, lang, addToCart, openCart, open
   }
 
   // Toast handler for Add to Cart
+  const isBreakfastPlus = product?.category === 'Breakfast Plus';
   const handleAddToCart = () => {
-    addToCart(product, { quantity: 1, source: 'PDVWrapper' });
+    // Check if bread selection is required but not selected
+    if (isBreakfastPlus && !selectedBread) {
+      // Can't show toast here as it's controlled globally, but we can prevent the action
+      return;
+    }
+    
+    // Create product with bread information if applicable
+    let productToAdd = { ...product };
+    if (isBreakfastPlus && selectedBread) {
+      const breadOption = breadOptions.find(b => b.en === selectedBread);
+      productToAdd.bread = {
+        en: breadOption.en,
+        ar: breadOption.ar
+      };
+      productToAdd.breadDisplay = lang === 'ar' ? breadOption.ar : breadOption.en;
+    }
+    
+    addToCart(productToAdd, { quantity: 1, source: 'PDVWrapper' });
     setShowItemControls(true);
     // Toast for add to cart is handled globally in App.js
   };
@@ -95,10 +122,78 @@ export default function PDVWrapper({ categories, lang, addToCart, openCart, open
           alt={product.name_en || product.name_ar || product.name}
         />
         <p className="menu-item-desc">{lang === 'ar' ? (product.description_ar || product.description_en || '') : (product.description_en || product.description_ar || '')}</p>
+        
+        {/* Bread selection for Breakfast Plus items */}
+        {isBreakfastPlus && (
+          <div style={{ 
+            marginBottom: '20px', 
+            padding: '16px', 
+            background: '#f8f9fa', 
+            borderRadius: '8px',
+            border: selectedBread ? '2px solid #2a5c45' : '2px solid #ff6b6b'
+          }}>
+            <label style={{ 
+              display: 'block', 
+              marginBottom: '8px',
+              fontSize: '1.05rem',
+              color: selectedBread ? '#2a5c45' : '#d32f2f',
+              fontWeight: '600'
+            }}>
+              {lang === 'ar' ? 'اختر نوع الخبز:' : 'Choose Your Base Bread:'} 
+              <span style={{ color: '#d32f2f', marginLeft: 4 }}>*</span>
+            </label>
+            <select 
+              value={selectedBread} 
+              onChange={e => setSelectedBread(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px',
+                fontSize: '1rem',
+                borderRadius: '6px',
+                border: selectedBread ? '1px solid #2a5c45' : '1px solid #ff6b6b',
+                outline: 'none',
+                cursor: 'pointer',
+                backgroundColor: selectedBread ? '#fff' : '#fff5f5'
+              }}
+            >
+              <option value="">{lang === 'ar' ? 'اختر نوع الخبز' : 'Select Bread Type'}</option>
+              {breadOptions.map(bread => (
+                <option key={bread.en} value={bread.en}>
+                  {lang === 'ar' ? bread.ar : bread.en}
+                </option>
+              ))}
+            </select>
+            {!selectedBread && (
+              <div style={{ fontSize: '0.85rem', color: '#d32f2f', marginTop: 6, fontWeight: 600 }}>
+                {lang === 'ar' ? 'مطلوب اختيار نوع الخبز' : 'Bread selection is required'}
+              </div>
+            )}
+          </div>
+        )}
+        
         <div className="price-box">{lang === 'ar' ? 'السعر:' : 'Price:'} <span className="price-bold">AED {product.price}</span></div>
         <div className="detail-actions">
-          <button className="add-btn" onClick={handleAddToCart} style={{ background: '#2a5c45', color: '#fff', borderRadius: 6, padding: '10px 24px', fontWeight: 600, border: 'none', fontSize: '1.08rem', cursor: 'pointer' }}>
-            {lang === 'ar' ? 'أضف إلى السلة' : 'Add to Cart'}
+          <button 
+            className="add-btn" 
+            onClick={handleAddToCart} 
+            style={{ 
+              background: (isBreakfastPlus && !selectedBread) ? '#ccc' : '#2a5c45', 
+              color: '#fff', 
+              borderRadius: 6, 
+              padding: '10px 24px', 
+              fontWeight: 600, 
+              border: 'none', 
+              fontSize: '1.08rem', 
+              cursor: (isBreakfastPlus && !selectedBread) ? 'not-allowed' : 'pointer',
+              opacity: (isBreakfastPlus && !selectedBread) ? 0.6 : 1,
+              width: '100%'
+            }}
+            disabled={isBreakfastPlus && !selectedBread}
+          >
+            {(isBreakfastPlus && !selectedBread)
+              ? (lang === 'ar' ? 'اختر الخبز أولاً' : 'Choose Bread First')
+              : (lang === 'ar' ? 'أضف إلى السلة' : 'Add to Cart')
+            }
           </button>
           {showItemControls && cartItem && (
             <div className="added-item-controls" style={{ marginTop: 18, display: 'flex', alignItems: 'center', gap: 16, background: '#f8f8f8', borderRadius: 8, padding: '12px 18px' }}>
