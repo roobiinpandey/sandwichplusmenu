@@ -48,6 +48,34 @@ top: 0;
 z-index: 100;
 box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
+
+/* Mobile Header Responsiveness */
+@media (max-width: 768px) {
+  .header {
+    padding: 12px 16px;
+    flex-wrap: wrap;
+  }
+  
+  .logo {
+    font-size: 1.2rem;
+  }
+  
+  .language-toggle {
+    margin-top: 8px;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 10px 12px;
+  }
+  
+  .logo {
+    font-size: 1.1rem;
+  }
+}
 .logo {
 font-size: 26px;
 font-weight: 700;
@@ -92,6 +120,34 @@ padding: 0 10px;
 -webkit-overflow-scrolling: touch;
 scrollbar-width: none;
 }
+
+/* Mobile Category Tabs */
+@media (max-width: 768px) {
+  .category-tabs {
+    top: 60px;
+    padding: 0 8px;
+  }
+  
+  .category-tab {
+    padding: 12px 14px;
+    font-size: 1rem;
+    white-space: nowrap;
+    min-width: auto;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .category-tabs {
+    top: 55px;
+    padding: 0 6px;
+  }
+  
+  .category-tab {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+}
 .category-tabs::-webkit-scrollbar {
 display: none;
 }
@@ -131,6 +187,23 @@ border-bottom: 2px solid var(--light);
 display: grid;
 grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
 gap: 20px;
+}
+
+/* Mobile Responsive Design */
+@media (max-width: 768px) {
+  .menu-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .menu-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 0 12px;
+  }
 }
 .menu-item {
 background: var(--white);
@@ -180,6 +253,47 @@ justify-content: space-between;
   font-size: 18px;
   white-space: nowrap;
   margin-left: 10px;
+}
+
+/* Mobile Menu Item Styles */
+@media (max-width: 768px) {
+  .menu-item-image-container {
+    height: 160px;
+  }
+  
+  .menu-item-info {
+    padding: 12px;
+  }
+  
+  .menu-item-name {
+    font-size: 16px;
+    margin-bottom: 6px;
+  }
+  
+  .menu-item-price {
+    font-size: 16px;
+    margin-left: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .menu-item-image-container {
+    height: 140px;
+  }
+  
+  .menu-item-info {
+    padding: 10px;
+  }
+  
+  .menu-item-name {
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+  
+  .menu-item-price {
+    font-size: 15px;
+    margin-left: 6px;
+  }
 }
 .menu-item-desc {
 color: var(--text-light);
@@ -278,11 +392,50 @@ padding: 5px 10px;
 border-radius: 4px;
 cursor: pointer;
 font-size: 18px;
+min-width: 36px;
+min-height: 36px;
 }
 .quantity-select span {
 font-weight: 600;
 min-width: 30px;
 text-align: center;
+}
+
+/* Mobile Quantity Controls */
+@media (max-width: 768px) {
+  .quantity-select {
+    gap: 12px;
+  }
+  
+  .quantity-select button {
+    padding: 8px 12px;
+    font-size: 16px;
+    min-width: 40px;
+    min-height: 40px; /* Touch-friendly size */
+  }
+  
+  .quantity-select span {
+    min-width: 32px;
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .quantity-select {
+    gap: 10px;
+  }
+  
+  .quantity-select button {
+    padding: 6px 10px;
+    font-size: 15px;
+    min-width: 38px;
+    min-height: 38px;
+  }
+  
+  .quantity-select span {
+    min-width: 28px;
+    font-size: 15px;
+  }
 }
 .detail-actions {
 display: flex;
@@ -311,6 +464,7 @@ transition: background 0.3s;
   cursor: pointer;
   transition: background 0.2s, box-shadow 0.2s, opacity 0.2s;
   outline: none;
+  min-height: 48px;
 }
 .add-btn:hover, .place-order-btn:hover, .view-order-btn:hover, .order-btn:hover {
   background: #43a047;
@@ -325,6 +479,23 @@ transition: background 0.3s;
   cursor: not-allowed;
   opacity: 0.7;
   box-shadow: none;
+}
+
+/* Mobile Button Styles */
+@media (max-width: 768px) {
+  .add-btn, .place-order-btn, .view-order-btn, .order-btn {
+    padding: 14px 20px;
+    font-size: 1rem;
+    min-height: 44px; /* Touch-friendly minimum height */
+  }
+}
+
+@media (max-width: 480px) {
+  .add-btn, .place-order-btn, .view-order-btn, .order-btn {
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    min-height: 44px;
+  }
 }
 .swipe-actions {
 display: flex;
@@ -374,6 +545,27 @@ background: var(--primary-dark);
   width: 100%;
   position: relative;
   animation: fadeInModal 0.3s;
+}
+
+/* Mobile Modal Styles */
+@media (max-width: 768px) {
+  .modal-content {
+    max-width: 90vw;
+    max-height: 90vh;
+    padding: 20px 16px 16px 16px;
+    margin: 20px;
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    max-width: 95vw;
+    max-height: 95vh;
+    padding: 18px 14px 14px 14px;
+    margin: 10px;
+    border-radius: 8px;
+  }
 }
 @keyframes fadeInModal {
   from { opacity: 0; transform: translateY(40px); }
