@@ -472,6 +472,12 @@ function Dashboard() {
                       <div key={item.id} className="order-item">
                         {item.name_en}
                         {showSize ? <span style={{ color: '#888', fontSize: '0.95em' }}> ({item.size})</span> : null}
+                        {/* Show bread selection if available */}
+                        {item.breadDisplay && (
+                          <span style={{ color: '#d32f2f', fontSize: '0.9em', fontWeight: '600', marginLeft: '8px' }}>
+                            [Bread: {item.breadDisplay}]
+                          </span>
+                        )}
                         x {item.quantity}
                         {showSize && item.price ? <span style={{ marginLeft: 8, color: '#2a8d6d', fontWeight: 600 }}>AED {Number(item.price).toFixed(2)}</span> : null}
                       </div>
