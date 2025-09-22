@@ -125,7 +125,7 @@ app.post('/auth/register',
 applySecurity(app);
 // Use modular routes
 app.use('/orders', ordersRoutes);
-// Enable menu routes for POST operations (adding/editing menu items)
+// Enable menu routes for POST operations (adding/editing menu items) - v2
 app.use('/menu', menuRoutes);
 app.use('/auth', authRoutes);
 app.use(healthRoutes);
