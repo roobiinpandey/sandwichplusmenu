@@ -27,8 +27,13 @@ export default function PlaceOrderModal({ show, order, lang, customerName, setCu
             <>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                 {order.map((item, idx) => (
-                  <li key={item.id + (item.size || '')} style={{ marginBottom: 16, background: '#fff', borderRadius: 12, boxShadow: '0 1px 6px rgba(0,0,0,0.04)', padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <li key={item.id + (item.size || '') + (item.breadDisplay || '')} style={{ marginBottom: 16, background: '#fff', borderRadius: 12, boxShadow: '0 1px 6px rgba(0,0,0,0.04)', padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 6 }}>
                     <div style={{ fontWeight: 700, fontSize: '1.08rem', marginBottom: 2 }}>{lang === 'ar' ? item.name_ar : item.name_en} {item.size ? `(${item.size})` : ''}</div>
+                    {item.breadDisplay && (
+                      <div style={{ fontSize: '0.9rem', color: '#666', fontStyle: 'italic', marginBottom: 4 }}>
+                        🍞 {lang === 'ar' ? 'خبز:' : 'Bread:'} {item.breadDisplay}
+                      </div>
+                    )}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                       <span style={{ fontSize: '1rem', color: accentColor, fontWeight: 700 }}>{lang === 'ar' ? 'الكمية:' : 'Qty:'} {item.quantity}</span>
                       <button onClick={() => onChangeQuantity(idx, 1)} style={{ padding: '6px 14px', fontSize: '1.08rem', fontWeight: 700, background: '#e6f4ea', color: accentColor, border: `1px solid ${accentColor}`, borderRadius: 6, cursor: 'pointer' }}>+</button>

@@ -339,7 +339,22 @@ function Dashboard() {
                   <div className="order-dialog-row" style={{ marginTop: 10 }}><strong>Items:</strong></div>
                   <ul className="order-dialog-items">
                     {selectedOrder.items && selectedOrder.items.map((it, idx) => (
-                      <li key={idx} className="order-dialog-item">{it.name_en || it.name || it.id} x {it.quantity || 1} <span className="order-dialog-item-price">AED {Number(it.price || it.unitPrice || 0).toFixed(2)}</span></li>
+                      <li key={idx} className="order-dialog-item">
+                        {it.name_en || it.name || it.id} x {it.quantity || 1}
+                        {/* Show bread selection if available */}
+                        {it.breadDisplay && (
+                          <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '2px', fontStyle: 'italic' }}>
+                            Bread: {it.breadDisplay}
+                          </div>
+                        )}
+                        {/* Show size if available */}
+                        {it.size && (
+                          <div style={{ fontSize: '0.85rem', color: '#666', marginTop: '2px', fontStyle: 'italic' }}>
+                            Size: {it.size}
+                          </div>
+                        )}
+                        <span className="order-dialog-item-price">AED {Number(it.price || it.unitPrice || 0).toFixed(2)}</span>
+                      </li>
                     ))}
                   </ul>
                   <div className="order-dialog-row order-dialog-total"><strong>Total:</strong> <span>AED {Number(selectedOrder.total || 0).toFixed(2)}</span></div>

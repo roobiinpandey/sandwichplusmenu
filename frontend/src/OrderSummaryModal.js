@@ -17,8 +17,16 @@ export default function OrderSummaryModal({ show, order, lang, onClose, onRemove
             <>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                 {order.map((item, idx) => (
-                  <li key={item.id + (item.size || '')} style={{ marginBottom: 16, background: '#fff', borderRadius: 12, boxShadow: '0 1px 6px rgba(0,0,0,0.04)', padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                    <div style={{ fontWeight: 700, fontSize: '1.08rem', marginBottom: 2 }}>{lang === 'ar' ? item.name_ar : item.name_en} {item.size ? `(${item.size})` : ''}</div>
+                  <li key={item.id + (item.size || '') + (item.breadDisplay || '')} style={{ marginBottom: 16, background: '#fff', borderRadius: 12, boxShadow: '0 1px 6px rgba(0,0,0,0.04)', padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <div style={{ fontWeight: 700, fontSize: '1.08rem', marginBottom: 2 }}>
+                      {lang === 'ar' ? item.name_ar : item.name_en} {item.size ? `(${item.size})` : ''}
+                    </div>
+                    {/* Show bread selection if available */}
+                    {item.breadDisplay && (
+                      <div style={{ fontSize: '0.9rem', color: '#2a5c45', fontWeight: 600, marginBottom: 4 }}>
+                        {lang === 'ar' ? 'نوع الخبز:' : 'Bread:'} {item.breadDisplay}
+                      </div>
+                    )}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                       <span style={{ fontSize: '1rem', color: '#2a5c45', fontWeight: 700 }}>{lang === 'ar' ? 'الكمية:' : 'Qty:'} {item.quantity}</span>
                       <button onClick={() => onChangeQuantity(idx, 1)} style={{ padding: '6px 14px', fontSize: '1.08rem', fontWeight: 700, background: '#e6f4ea', color: '#2a5c45', border: '1px solid #2a5c45', borderRadius: 6, cursor: 'pointer' }}>+</button>
