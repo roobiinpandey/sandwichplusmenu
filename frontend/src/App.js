@@ -84,9 +84,10 @@ function App() {
 			console.debug('[addToCart] called', { time: new Date().toISOString(), source, actionId, productId: product.id, sizeLabel, quantity });
 		} catch (e) {}
 
-		// Duplicate-add guard: ignore identical add calls (same product+size) within short window
+		// Duplicate-add guard: ignore identical add calls (same product+size+bread) within short window
 		try {
-			const key = `${product.id}::${sizeLabel}`;
+			const breadKey = product.breadDisplay || '';
+			const key = `${product.id}::${sizeLabel}::${breadKey}`;
 			const now = Date.now();
 			// If there's an in-flight add for this key, block it
 			if (inFlightAdds.current.has(key)) {
@@ -108,17 +109,19 @@ function App() {
 		console.debug('[addToCart] proceeding to setOrder', { productId: product.id, sizeLabel, quantity });
 		// Use a queue to serialize setOrder updates and prevent race conditions
 		setOrder(prev => {
-			// Find all items with same id and size
-			const filtered = prev.filter(it => !(it.id === product.id && (it.size || '') === sizeLabel));
-			const existing = prev.find(it => it.id === product.id && (it.size || '') === sizeLabel);
+			// For bread items, also consider bread selection when finding duplicates
+			const breadKey = product.breadDisplay || '';
+			const filtered = prev.filter(it => !(it.id === product.id && (it.size || '') === sizeLabel && (it.breadDisplay || '') === breadKey));
+			const existing = prev.find(it => it.id === product.id && (it.size || '') === sizeLabel && (it.breadDisplay || '') === breadKey);
 			let newQuantity = quantity;
 			if (existing) {
 				newQuantity += existing.quantity;
 			}
-			// Always return a single entry for this product+size
+			// Always return a single entry for this product+size+bread, preserving all product properties
 			return [
 				...filtered,
 				{
+					...product, // Preserve all properties including bread, breadDisplay, category, etc.
 					id: product.id,
 					name_en: product.name_en,
 					name_ar: product.name_ar,
