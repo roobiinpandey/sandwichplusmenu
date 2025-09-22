@@ -153,4 +153,107 @@ router.post('/', verifyToken, upload.single('image'), async (req, res) => {
   }
 });
 
+// PUT /menu/:id - update an existing menu item
+router.put('/:id', verifyToken, upload.single('image'), async (req, res) => {
+  try {
+    const itemId = req.params.id;
+    
+    // Robustly parse has_sizes and sizes
+    const hasSizes = req.body.has_sizes === 'true' || req.body.has_sizes === true;
+    let sizes = [];
+    if (req.body.sizes) {
+      try {
+        sizes = typeof req.body.sizes === 'string' ? JSON.parse(req.body.sizes) : req.body.sizes;
+      } catch (e) {
+        console.log('Sizes parse error:', req.body.sizes, e);
+        return res.status(400).json({ error: 'Invalid sizes format' });
+      }
+    }
+
+    console.log('PUT /menu/:id received:', {
+      id: itemId,
+      name_en: req.body.name_en,
+      name_ar: req.body.name_ar,
+      mainCategory: req.body.category,
+      subcategory: req.body.subcategory,
+      price: req.body.price,
+      has_sizes: hasSizes,
+      sizes,
+      image: req.file ? req.file.filename : null
+    });
+
+    // Parse fields from form-data
+    const name_en = req.body.name_en;
+    const name_ar = req.body.name_ar;
+    const price = req.body.price;
+    const mainCategory = req.body.category;
+    const subcategory = req.body.subcategory;
+    const description_en = req.body.description_en;
+    const description_ar = req.body.description_ar;
+
+    // Validate required fields
+    if (!name_en || !mainCategory || (!hasSizes && !price) || (hasSizes && (!sizes || !sizes.length))) {
+      console.log('Update validation failed:', {
+        name_en,
+        mainCategory,
+        price,
+        hasSizes,
+        sizes
+      });
+      return res.status(400).json({ error: 'Missing required fields' });
+    }
+
+    // If hasSizes, ensure sizes array is valid
+    if (hasSizes && (!sizes || !Array.isArray(sizes) || sizes.some(sz => !sz.size || !sz.price))) {
+      return res.status(400).json({ error: 'Missing or invalid sizes for item with sizes' });
+    }
+
+    // Find the existing item
+    const existingItem = await MenuItem.findOne({ id: itemId });
+    if (!existingItem) {
+      return res.status(404).json({ error: 'Menu item not found' });
+    }
+
+    // Handle image upload - convert to base64 for persistent storage
+    let images = existingItem.images || []; // Keep existing images by default
+    if (req.file) {
+      try {
+        // Read the uploaded file and convert to base64
+        const imageBuffer = fs.readFileSync(req.file.path);
+        const base64Image = `data:${req.file.mimetype};base64,${imageBuffer.toString('base64')}`;
+        images = [base64Image]; // Replace existing images with new one
+        
+        // Clean up the temporary file
+        fs.unlinkSync(req.file.path);
+      } catch (error) {
+        console.error('Error processing image:', error);
+        return res.status(500).json({ error: 'Failed to process image' });
+      }
+    }
+
+    // Update the item
+    const updatedItem = await MenuItem.findOneAndUpdate(
+      { id: itemId },
+      {
+        name_en,
+        name_ar,
+        price: price || null,
+        images,
+        has_sizes: hasSizes,
+        sizes,
+        category: mainCategory,
+        subcategory,
+        description_en,
+        description_ar
+      },
+      { new: true }
+    );
+
+    res.json({ success: true, item: updatedItem });
+  } catch (err) {
+    console.error('Update menu item error:', err);
+    res.status(500).json({ error: 'Failed to update item', details: err.message });
+  }
+});
+
 module.exports = router;
