@@ -18,44 +18,51 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// GET /menu - EMERGENCY FAST VERSION - return all menu items quickly
+// Cache for emergency performance
+let menuCache = null;
+let cacheTimestamp = 0;
+const CACHE_DURATION = 60000; // 1 minute cache
+
+// GET /menu - EMERGENCY ULTRA-FAST VERSION with caching
 router.get('/', async (req, res) => {
   try {
-    console.log('[FAST-MENU] Starting fast menu fetch...');
+    const now = Date.now();
+    
+    // Return cached data if available and fresh
+    if (menuCache && (now - cacheTimestamp) < CACHE_DURATION) {
+      console.log('[ULTRA-FAST-MENU] Serving from cache');
+      return res.json(menuCache);
+    }
+    
+    console.log('[ULTRA-FAST-MENU] Starting fresh fetch...');
     const startTime = Date.now();
     
-    // Simple fast query - get all items directly
-    const items = await MenuItem.find().lean().limit(100);
-    console.log(`[FAST-MENU] Found ${items.length} items in ${Date.now() - startTime}ms`);
+    // Ultra-simple query with minimal data
+    const items = await MenuItem.find({}, 'name_en name_ar price category').lean().limit(50);
+    console.log(`[ULTRA-FAST-MENU] Query completed in ${Date.now() - startTime}ms`);
     
-    // Simple category grouping without complex lookups
+    // Minimal processing
     const categoriesMap = {};
-    const categories = ['Hot Drinks', 'Cold Drinks', 'Breakfast Plus', 'Sandwiches', 'Salads', 'Sweets', 'Healthy', 'Pasta'];
     
-    // Initialize categories
-    categories.forEach(cat => {
-      categoriesMap[cat] = { name_en: cat, name_ar: cat, items: [] };
-    });
-    
-    // Group items by category
     items.forEach(item => {
-      const cat = item.category || 'Uncategorized';
+      const cat = item.category || 'Other';
       if (!categoriesMap[cat]) {
         categoriesMap[cat] = { name_en: cat, name_ar: cat, items: [] };
       }
       categoriesMap[cat].items.push(item);
     });
     
-    // Convert to array and filter out empty categories
-    const result = Object.entries(categoriesMap)
-      .filter(([_, catData]) => catData.items.length > 0)
-      .map(([catName, catData]) => catData);
+    const result = Object.values(categoriesMap).filter(cat => cat.items.length > 0);
     
-    console.log(`[FAST-MENU] Completed in ${Date.now() - startTime}ms`);
-    res.json({ categories: result });
+    // Cache the result
+    menuCache = { categories: result };
+    cacheTimestamp = now;
+    
+    console.log(`[ULTRA-FAST-MENU] Total time: ${Date.now() - startTime}ms`);
+    res.json(menuCache);
     
   } catch (error) {
-    console.error('[FAST-MENU] Error:', error);
+    console.error('[ULTRA-FAST-MENU] Error:', error);
     res.status(500).json({ error: 'Failed to fetch menu', details: error.message });
   }
 });
