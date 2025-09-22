@@ -1,5 +1,6 @@
 import React from 'react';
 import axios from 'axios';
+import { getItemImageUrl } from '../utils/imageUtils';
 
 function MenuItemModal({ mode, item, onClose, onSuccess, categories }) {
   const [hasSizes, setHasSizes] = React.useState(item?.sizes && item?.sizes.length > 0);
@@ -221,7 +222,7 @@ function MenuItemModal({ mode, item, onClose, onSuccess, categories }) {
               <div style={{ marginTop: '6px' }}>
                 <span>Current image:</span><br />
                 <img
-                  src={formData.images[0]}
+                  src={getItemImageUrl({ images: formData.images })}
                   alt="Current"
                   style={{ maxWidth: '120px', maxHeight: '120px', borderRadius: '8px', marginTop: '4px' }}
                 />

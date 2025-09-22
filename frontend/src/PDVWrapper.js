@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { getItemImageUrl } from './utils/imageUtils';
 import './App.css';
 
 const LANGS = [
@@ -90,7 +91,7 @@ export default function PDVWrapper({ categories, lang, addToCart, openCart, open
       <div className="detail-content">
         <h2>{product.name_en || product.name_ar || product.name}</h2>
         <img
-          src={product.images && product.images[0] ? product.images[0] : 'https://via.placeholder.com/540x320?text=No+Image'}
+          src={getItemImageUrl(product, 'https://via.placeholder.com/540x320?text=No+Image')}
           alt={product.name_en || product.name_ar || product.name}
         />
         <p className="menu-item-desc">{product.description_en || product.description_ar || ''}</p>

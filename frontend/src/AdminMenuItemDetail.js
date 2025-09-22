@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { getItemImageUrl } from '../utils/imageUtils';
 import axios from 'axios';
 import './AdminDashboard.css';
 
@@ -66,7 +67,7 @@ export default function AdminMenuItemDetail() {
       }}>
         <button style={{ position: 'absolute', top: 24, left: 24, background: '#d32f2f', color: '#fff', borderRadius: 6, padding: '8px 18px', fontWeight: 600, border: 'none', cursor: 'pointer' }} onClick={() => navigate(-1)}>&larr; Back</button>
         <h2 style={{ fontSize: '2.2rem', fontWeight: 700, marginBottom: 24 }}>{item.name_en || item.name_ar || item.name}</h2>
-        <img src={item.images && item.images[0] ? item.images[0] : 'https://via.placeholder.com/540x320?text=No+Image'} alt={item.name_en || item.name_ar || item.name} style={{ width: '100%', maxWidth: 420, borderRadius: 16, marginBottom: 28, boxShadow: '0 2px 12px rgba(0,0,0,0.10)' }} />
+        <img src={getItemImageUrl(item, 'https://via.placeholder.com/540x320?text=No+Image')} alt={item.name_en || item.name_ar || item.name} style={{ width: '100%', maxWidth: 420, borderRadius: 16, marginBottom: 28, boxShadow: '0 2px 12px rgba(0,0,0,0.10)' }} />
         <div style={{ fontWeight: 600, fontSize: '1.25rem', marginBottom: 18 }}>{item.description_en || item.description_ar || ''}</div>
         <div style={{ fontWeight: 700, fontSize: '1.4rem', marginBottom: 24, color: 'var(--primary)' }}>Price: AED {item.price}</div>
         <div style={{ fontSize: '1.1rem', marginBottom: 10 }}>Category: <span style={{ fontWeight: 600 }}>{item.category}</span></div>

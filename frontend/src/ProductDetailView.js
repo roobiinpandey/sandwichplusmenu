@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useRef } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { getItemImageUrl } from './utils/imageUtils';
 
 // Detail view (renamed from ProductDetailPage) with swipe navigation and size handling
 const ProductDetailView = ({ categories, lang, addToCart, openCart, openPlaceOrder, order, setLang }) => {
@@ -78,7 +79,7 @@ const ProductDetailView = ({ categories, lang, addToCart, openCart, openPlaceOrd
           <h2 style={{ fontSize: '2rem', color: 'var(--primary)', marginBottom: '20px', fontWeight: '700', textAlign: lang === 'ar' ? 'right' : 'left' }}>{lang === 'ar' ? product.name_ar : product.name_en}</h2>
           {product.images && product.images.length > 0 && (
             <div style={{ borderRadius: '16px', overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.15)', marginBottom: '24px' }}>
-              <img src={product.images[0]} alt={lang === 'ar' ? product.name_ar : product.name_en} style={{ width: '100%', height: '400px', objectFit: 'cover', display: 'block' }} />
+              <img src={getItemImageUrl(product)} alt={lang === 'ar' ? product.name_ar : product.name_en} style={{ width: '100%', height: '400px', objectFit: 'cover', display: 'block' }} />
             </div>
           )}
           <div style={{ display: 'flex', margin: '24px 0' }}>

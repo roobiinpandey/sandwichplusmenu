@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { getItemImageUrl } from './utils/imageUtils';
 
 // Detail page: shows a single menu item (handles swipe left/right navigation)
 // Robustness enhancements added: safer flattening, id coercion, guards.
@@ -246,7 +247,7 @@ const ProductDetailPage = ({ categories, lang, addToCart, openCart, openPlaceOrd
               marginBottom: '24px'
             }}>
               <img 
-                src={product.images[0]} 
+                src={getItemImageUrl(product)} 
                 alt={lang === 'ar' ? product.name_ar : product.name_en} 
                 style={{ 
                   width: '100%',

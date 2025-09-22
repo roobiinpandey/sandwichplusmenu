@@ -1,4 +1,6 @@
 import React, { useState, useRef } from 'react';
+import { getItemImageUrl } from '../utils/imageUtils';
+
 const MenuItem = ({ item, lang, onAddToCart, cartQuantity, onChangeQuantity, onShowDetail }) => {
   const [addedMsg, setAddedMsg] = useState('');
   const [adding, setAdding] = useState(false);
@@ -38,7 +40,7 @@ const MenuItem = ({ item, lang, onAddToCart, cartQuantity, onChangeQuantity, onS
     <div className="menu-item" onClick={e => { if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'SELECT') onShowDetail && onShowDetail(); }}>
       <div className="menu-item-image-container">
         <img
-          src={item.images && item.images[0] ? item.images[0] : 'https://via.placeholder.com/300x200?text=No+Image'}
+          src={getItemImageUrl(item, 'https://via.placeholder.com/300x200?text=No+Image')}
           className="menu-item-image"
           alt={lang === 'ar' ? item.name_ar : item.name_en}
           onError={e => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/300x200?text=No+Image'; }}
