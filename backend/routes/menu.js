@@ -256,4 +256,28 @@ router.put('/:id', verifyToken, upload.single('image'), async (req, res) => {
   }
 });
 
+// DELETE /menu/:id - delete a menu item
+router.delete('/:id', verifyToken, async (req, res) => {
+  try {
+    const itemId = req.params.id;
+    
+    console.log('DELETE /menu/:id received:', {
+      id: itemId
+    });
+
+    // Find and delete the item
+    const deletedItem = await MenuItem.findOneAndDelete({ id: itemId });
+    
+    if (!deletedItem) {
+      return res.status(404).json({ error: 'Menu item not found' });
+    }
+
+    console.log('Successfully deleted menu item:', deletedItem.name_en);
+    res.json({ success: true, message: 'Item deleted successfully', item: deletedItem });
+  } catch (err) {
+    console.error('Delete menu item error:', err);
+    res.status(500).json({ error: 'Failed to delete item', details: err.message });
+  }
+});
+
 module.exports = router;
