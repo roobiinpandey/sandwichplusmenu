@@ -143,13 +143,13 @@ function MenuItemModal({ mode, item, onClose, onSuccess, categories }) {
             {errors.mainCategory && <div style={{ color: '#d32f2f', fontWeight: 600 }}>{errors.mainCategory}</div>}
           </label>
           <label>
-            Subcategory (Optional):
+            Subcategory:
             <select
               value={formData.subcategory}
               onChange={e => setFormData({ ...formData, subcategory: e.target.value })}
               style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #ccc', marginTop: '4px' }}
             >
-              <option value="">Select Subcategory (Optional)</option>
+              <option value="">None</option>
               <option value="CHICKEN">CHICKEN</option>
               <option value="BEEF">BEEF</option>
               <option value="HOT">HOT</option>
