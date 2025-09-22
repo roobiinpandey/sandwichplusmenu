@@ -263,7 +263,15 @@ app.post('/orders',
     try {
   console.log('Received new order POST:', JSON.stringify(req.body).slice(0, 2000));
   // Full debug log for diagnosis
-  try { console.log('Received new order RAW BODY:', req.body); } catch (e) {}
+  try { 
+    console.log('Received new order RAW BODY:', req.body); 
+    console.log('Request headers:', req.headers);
+    console.log('Customer:', req.body.customer, 'type:', typeof req.body.customer);
+    console.log('Items:', req.body.items, 'type:', typeof req.body.items, 'length:', req.body.items?.length);
+    console.log('Total:', req.body.total, 'type:', typeof req.body.total);
+  } catch (e) {
+    console.error('Error logging request details:', e.message);
+  }
   // compute orderDate YYYYMMDD for dashboard compatibility
   const now = new Date();
   const orderDate = now.toISOString().slice(0,10).replace(/-/g,''); // YYYYMMDD
