@@ -157,16 +157,21 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
           if (!cat) return null;
           // Group items by subcategory
           const subcatGroups = {};
+          const itemsWithoutSubcat = []; // Items with no subcategory
           const knownHotColdSubs = ['HOT', 'COLD', 'BLENDED', 'TEA', 'DRINKS'];
           if (Array.isArray(cat.items)) {
             cat.items.forEach(item => {
               let subcat = item.subcategory;
               if (cat.name_en === 'HOT & COLD DRINKS') {
                 if (!subcat || !knownHotColdSubs.includes(subcat)) {
-                  subcat = 'Other';
+                  itemsWithoutSubcat.push(item); // Don't show "Other" for HOT & COLD DRINKS
+                  return;
                 }
               } else {
-                subcat = subcat || 'Other';
+                if (!subcat) {
+                  itemsWithoutSubcat.push(item); // Items without subcategory go here
+                  return;
+                }
               }
               if (!subcatGroups[subcat]) subcatGroups[subcat] = [];
               subcatGroups[subcat].push(item);
@@ -175,12 +180,42 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
           return (
             <div className="menu-section">
               <h2 className="subcategory-heading">{getCategoryKey(cat)}</h2>
-              {Object.entries(subcatGroups)
-                .filter(([subcat, items]) => subcat !== 'Other' || items.length > 0)
-                .map(([subcat, items]) => (
+              
+              {/* Items without subcategory - displayed directly without subcategory heading */}
+              {itemsWithoutSubcat.length > 0 && (
+                <div style={{ marginBottom: '32px' }}>
+                  <div className="menu-grid">
+                    {itemsWithoutSubcat.map((item, index) => (
+                      <div key={item.id} className="menu-card">
+                        <div style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: 6 }}>
+                          {lang === 'ar' ? item.name_ar : item.name_en}
+                        </div>
+                        <MenuItem
+                          item={item}
+                          lang={lang}
+                          cartQuantity={order.find(o => o.id === item.id)?.quantity || 0}
+                          onAddToCart={(product, opts) => {
+                            addToCart(product, opts);
+                            setToast({ show: true, message: `${lang === 'ar' ? 'تمت إضافة المنتج' : 'Item is added'} (${(order.find(o => o.id === item.id)?.quantity || 0) + 1} ${lang === 'ar' ? 'منتج' : 'item(s)'})`, type: 'success' });
+                            setTimeout(() => setToast({ show: false, message: '', type: 'default' }), 2000);
+                          }}
+                          onChangeQuantity={delta => {
+                            const idx = order.findIndex(o => o.id === item.id);
+                            if (idx !== -1) handleChangeQuantity(idx, delta);
+                          }}
+                          onShowDetail={() => navigate(`/detail/${item.id}?category=${activeCategory}`)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {/* Items with subcategories */}
+              {Object.entries(subcatGroups).map(([subcat, items]) => (
                   <div key={subcat} style={{ marginBottom: '32px' }}>
                     <h3 style={{ fontWeight: 700, fontSize: '1.3rem', marginBottom: '12px', color: 'var(--primary)' }}>
-                      {subcat !== 'Other' ? subcat : (lang === 'ar' ? 'أخرى' : 'Other')}
+                      {subcat}
                     </h3>
                     <div className="menu-grid">
                       {items.map(item => (
