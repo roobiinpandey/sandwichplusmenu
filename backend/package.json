@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "create-indexes": "node scripts/createIndexes.js",
+    "db:optimize": "node scripts/createIndexes.js"
   },
   "keywords": [],
   "author": "",

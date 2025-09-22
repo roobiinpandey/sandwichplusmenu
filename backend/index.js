@@ -67,6 +67,130 @@ app.get('/', (req, res) => res.json({ message: 'SWP Backend API is running' }));
 
 // lightweight health check
 app.get('/ping', (req, res) => res.json({ ok: true }));
+
+// Simple test endpoint
+app.get('/test-db', async (req, res) => {
+  try {
+    const mongoose = require('mongoose');
+    const MenuItem = require('./models/MenuItem');
+    const Category = require('./models/Category');
+    
+    const dbState = mongoose.connection.readyState;
+    const itemCount = await MenuItem.countDocuments();
+    const categoryCount = await Category.countDocuments();
+    
+    res.json({
+      status: 'ok',
+      database: {
+        state: dbState === 1 ? 'connected' : 'disconnected',
+        itemCount,
+        categoryCount
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      error: error.message
+    });
+  }
+});
+
+// Simple menu test endpoint
+app.get('/menu-simple', async (req, res) => {
+  try {
+    const mongoose = require('mongoose');
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({ error: 'Database not connected' });
+    }
+    
+    const Category = require('./models/Category');
+    const MenuItem = require('./models/MenuItem');
+    
+    // Get categories first
+    const categories = await Category.find().maxTimeMS(5000);
+    console.log(`Found ${categories.length} categories`);
+    
+    // Get items with timeout
+    const items = await MenuItem.find().maxTimeMS(5000);
+    console.log(`Found ${items.length} items`);
+    
+    // Simple response
+    res.json({
+      status: 'success',
+      categoryCount: categories.length,
+      itemCount: items.length,
+      categories: categories.map(c => ({ name_en: c.name_en, name_ar: c.name_ar }))
+    });
+    
+  } catch (error) {
+    console.error('Menu-simple error:', error.message);
+    res.status(500).json({
+      status: 'error',
+      error: error.message
+    });
+  }
+});
+
+// Basic menu endpoint bypass
+app.get('/menu-basic', async (req, res) => {
+  try {
+    const mongoose = require('mongoose');
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({ error: 'Database not connected' });
+    }
+    
+    const MenuItem = require('./models/MenuItem');
+    const Category = require('./models/Category');
+    
+    // Get all categories first
+    const allCategories = await Category.find({}).maxTimeMS(3000);
+    
+    // Get all items
+    const allItems = await MenuItem.find({}).maxTimeMS(5000);
+    
+    // Create categories map with all categories
+    const categoriesMap = {};
+    
+    // Initialize all categories (even empty ones)
+    allCategories.forEach(cat => {
+      categoriesMap[cat.name_en] = {
+        name_en: cat.name_en,
+        name_ar: cat.name_ar || '',
+        items: []
+      };
+    });
+    
+    // Add items to their categories
+    allItems.forEach(item => {
+      const categoryName = item.category || 'Uncategorized';
+      if (categoriesMap[categoryName]) {
+        // Limit to 3 items per category to keep response manageable
+        if (categoriesMap[categoryName].items.length < 3) {
+          categoriesMap[categoryName].items.push({
+            id: item.id,
+            name_en: item.name_en,
+            name_ar: item.name_ar,
+            price: item.price,
+            category: item.category
+          });
+        }
+      }
+    });
+    
+    // Return all categories (including empty ones for completeness)
+    const resultCategories = Object.values(categoriesMap);
+    res.json({ categories: resultCategories });
+    
+  } catch (error) {
+    console.error('Menu-basic error:', error.message);
+    res.status(500).json({
+      status: 'error',
+      error: error.message
+    });
+  }
+});
+
 // Note: /health route is handled by healthRoutes router
 // app.get('/health', async (req, res) => {
 //   try {
@@ -133,27 +257,73 @@ app.use(healthRoutes);
 // Set mongoose configuration
 mongoose.set('strictQuery', false); // Suppress deprecation warning
 
-// MongoDB connection using environment variable
+// MongoDB connection using environment variable with retry logic
 const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/swpdb';
 console.log('Connecting to MongoDB at', mongoUri.replace(/\/\/([^:]+):([^@]+)@/, '//$1:***@')); // Hide password in logs
 
-// Connect to MongoDB with modern connection options
-mongoose.connect(mongoUri)
-  .then(() => {
-    console.log('Connected to MongoDB successfully');
-    // Ensure counters collection has a TTL index on expireAt for automatic cleanup
+// Retry connection function
+const connectWithRetry = async (retries = 5) => {
+  for (let i = 0; i < retries; i++) {
     try {
-      const adminDb = mongoose.connection.db;
-      adminDb.collection('counters').createIndex({ expireAt: 1 }, { expireAfterSeconds: 0 });
-      console.log('Ensured TTL index on counters.expireAt');
-    } catch (e) {
-      console.log('Failed to ensure TTL index on counters:', e.message);
+      console.log(`Attempting MongoDB connection (${i + 1}/${retries})...`);
+      
+      await mongoose.connect(mongoUri, {
+        // Connection Pool Configuration
+        maxPoolSize: 10,          // Maintain up to 10 socket connections
+        serverSelectionTimeoutMS: 30000, // Increase timeout for production
+        socketTimeoutMS: 45000,   // Close sockets after 45 seconds of inactivity
+        
+        // Connection Management  
+        maxIdleTimeMS: 30000,     // Close connections after 30 seconds of inactivity
+        waitQueueTimeoutMS: 10000, // Make the client wait up to 10 seconds for a connection
+        
+        // Replica Set Options (for Atlas)
+        readPreference: 'primary', // Ensure consistency for restaurant orders
+        retryWrites: true,        // Retry writes on network errors
+        retryReads: true,         // Retry reads on network errors
+        
+        // Compression (reduces bandwidth)
+        compressors: 'zlib'
+      });
+      
+      console.log('Connected to MongoDB successfully');
+      console.log('Database connection established with optimized settings');
+      
+      // Start the server only after successful database connection
+      const PORT = process.env.PORT || 3001;
+      app.listen(PORT, '0.0.0.0', () => {
+        console.log(`✅ Server running on port ${PORT}`);
+        console.log(`✅ Environment: ${process.env.NODE_ENV || 'development'}`);
+        console.log(`✅ Server ready to accept connections`);
+      });
+      
+      // Ensure counters collection has a TTL index on expireAt for automatic cleanup
+      try {
+        const adminDb = mongoose.connection.db;
+        adminDb.collection('counters').createIndex({ expireAt: 1 }, { expireAfterSeconds: 0 });
+        console.log('Ensured TTL index on counters.expireAt');
+      } catch (e) {
+        console.log('Failed to ensure TTL index on counters:', e.message);
+      }
+      
+      return; // Success, exit retry loop
+      
+    } catch (error) {
+      console.error(`MongoDB connection attempt ${i + 1} failed:`, error.message);
+      
+      if (i === retries - 1) {
+        console.error('All MongoDB connection attempts failed. Exiting...');
+        process.exit(1);
+      }
+      
+      console.log(`Retrying in 5 seconds...`);
+      await new Promise(resolve => setTimeout(resolve, 5000));
     }
-  })
-  .catch((error) => {
-    console.error('MongoDB connection error:', error);
-    process.exit(1); // Exit if cannot connect to database
-  });
+  }
+};
+
+// Start connection with retry
+connectWithRetry();
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
@@ -625,27 +795,17 @@ MenuItem.find().distinct('category').then(categories => {
   });
 });
 
-const PORT = process.env.PORT || 3001;
-
-// Add error handling for server startup
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ Server running on port ${PORT}`);
-  console.log(`✅ Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`✅ Server ready to accept connections`);
-});
-
-server.on('error', (error) => {
-  console.error('❌ Server startup error:', error);
-  process.exit(1);
-});
-
-// Graceful shutdown
+// Graceful shutdown handling
 process.on('SIGTERM', () => {
   console.log('SIGTERM received, shutting down gracefully');
-  server.close(() => {
-    mongoose.connection.close();
-    process.exit(0);
-  });
+  mongoose.connection.close();
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully');
+  mongoose.connection.close();
+  process.exit(0);
 });
 
 process.on('SIGINT', () => {

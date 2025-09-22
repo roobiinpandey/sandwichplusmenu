@@ -68,14 +68,25 @@ const MenuItem = ({ item, lang, onAddToCart, cartQuantity, onChangeQuantity, onS
       setAdding(false);
     }, 500);
   };
+  
+  // Simple inline SVG placeholder without base64 encoding
+  const placeholderSvg = 'data:image/svg+xml,' + encodeURIComponent(`
+    <svg width="300" height="200" xmlns="http://www.w3.org/2000/svg">
+      <rect width="100%" height="100%" fill="#f0f0f0"/>
+      <text x="50%" y="50%" font-family="Arial, sans-serif" font-size="16" fill="#999" text-anchor="middle" dy=".3em">
+        No Image
+      </text>
+    </svg>
+  `);
+
   return (
     <div className="menu-item" onClick={e => { if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'SELECT') onShowDetail && onShowDetail(); }}>
       <div className="menu-item-image-container">
         <img
-          src={getItemImageUrl(item, 'https://via.placeholder.com/300x200?text=No+Image')}
+          src={getItemImageUrl(item, placeholderSvg)}
           className="menu-item-image"
           alt={lang === 'ar' ? item.name_ar : item.name_en}
-          onError={e => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/300x200?text=No+Image'; }}
+          onError={e => { e.target.onerror = null; e.target.src = placeholderSvg; }}
         />
       </div>
       <div className="menu-item-info">

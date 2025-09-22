@@ -111,17 +111,74 @@ exports.createOrder = [
 
 exports.getOrders = async (req, res) => {
   try {
-    // If ?all=true, return all orders, else filter by today's date
-    let orders;
-    if (req.query.all === 'true') {
-      orders = await Order.find({}).sort({ time: -1 });
-    } else {
-      const today = new Date();
-      const targetDate = today.toISOString().slice(0,10).replace(/-/g,'');
-      orders = await Order.find({ orderDate: targetDate }).sort({ time: -1 });
+    // Pagination parameters
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50; // Default 50 orders per page
+    const skip = (page - 1) * limit;
+    
+    // Date filtering
+    const { date, status, all } = req.query;
+    let query = {};
+    
+    if (all !== 'true') {
+      // Default to today's orders if no specific date provided
+      const targetDate = date || new Date().toISOString().slice(0,10).replace(/-/g,'');
+      query.orderDate = targetDate;
     }
-    res.json(orders);
+    
+    // Status filtering
+    if (status && status !== 'all') {
+      query.status = status.toLowerCase();
+    }
+    
+    // Build aggregation pipeline for better performance
+    const pipeline = [
+      { $match: query },
+      { $sort: { time: -1 } }, // Most recent first
+      { 
+        $facet: {
+          orders: [
+            { $skip: skip },
+            { $limit: limit },
+            {
+              $project: {
+                customer: 1,
+                phone: 1,
+                items: 1,
+                total: 1,
+                time: 1,
+                orderDate: 1,
+                orderNumber: 1,
+                orderSeq: 1,
+                status: 1,
+                notes: 1,
+                createdAt: 1
+              }
+            }
+          ],
+          totalCount: [{ $count: "count" }]
+        }
+      }
+    ];
+    
+    const result = await Order.aggregate(pipeline);
+    const orders = result[0].orders;
+    const totalCount = result[0].totalCount[0]?.count || 0;
+    const totalPages = Math.ceil(totalCount / limit);
+    
+    res.json({
+      orders,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalCount,
+        limit,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      }
+    });
   } catch (err) {
+    console.error('Failed to fetch orders:', err);
     res.status(500).json({ error: 'Failed to fetch orders', details: err.message });
   }
 };

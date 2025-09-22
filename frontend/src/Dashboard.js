@@ -15,6 +15,14 @@ function Dashboard() {
   const [actionMsg, setActionMsg] = useState('');
   const [newOrderAnim, setNewOrderAnim] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [pagination, setPagination] = useState(null);
+  
   const closeOrderDialog = () => {
     const dlg = orderDialogRef.current;
     if (dlg) { dlg.classList.add('closing'); setTimeout(() => setSelectedOrder(null), 180); } else setSelectedOrder(null);
@@ -38,80 +46,96 @@ function Dashboard() {
   const prevOrderIds = useRef([]);
 
   useEffect(() => {
-    const fetchOrders = () => {
+    const fetchOrders = async () => {
       const token = localStorage.getItem('token');
       const headers = token ? { Authorization: `Bearer ${token}` } : {};
       
-      // Add debug logging
+      setLoading(true);
       console.log('[Dashboard] Fetching orders...', new Date().toLocaleTimeString());
       
-      // Always request all orders, not just today's
-      axios.get('/orders?all=true', { headers }).then(res => {
-        // ensure newest-first by time
-        const sorted = (res.data || []).slice().sort((a, b) => new Date(b.time) - new Date(a.time));
-        setOrders(sorted);
-        const ids = (res.data || []).map(o => o._id);
+      try {
+        // Build query parameters for pagination and filtering
+        const params = new URLSearchParams({
+          page: currentPage.toString(),
+          limit: '25', // Load 25 orders per page
+          status: orderStatusFilter === 'all' ? '' : orderStatusFilter
+        });
         
-        console.log('[Dashboard] Current orders:', ids.length, 'Previous:', prevOrderIds.current.length);
-        
-        if (prevOrderIds.current.length && ids.length > prevOrderIds.current.length) {
-          const added = ids.filter(id => !prevOrderIds.current.includes(id));
-          if (added.length) {
-            console.log('[Dashboard] New orders detected:', added);
-            setNewOrderIds(ids => [...ids, ...added]);
-            setNewOrderToastIds(ids => [...ids, ...added]);
-          }
-          setNewOrderAnim(true);
-          setTimeout(() => setNewOrderAnim(false), 1200);
+        // Add date filtering
+        if (orderFilter === 'today') {
+          params.set('date', new Date().toISOString().slice(0,10).replace(/-/g,''));
+        } else if (orderFilter === 'yesterday') {
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          params.set('date', yesterday.toISOString().slice(0,10).replace(/-/g,''));
+        } else if (orderFilter === 'custom' && customDate) {
+          params.set('date', customDate.replace(/-/g,''));
+        } else if (orderFilter === 'all') {
+          params.set('all', 'true');
         }
-        prevOrderIds.current = ids;
-      }).catch(err => {
+        
+        const response = await axios.get(`/orders?${params}`, { headers });
+        const data = response.data;
+        
+        // Handle both old format (array) and new format (object with pagination)
+        if (Array.isArray(data)) {
+          // Old format - backwards compatibility
+          setOrders(data);
+          setPagination(null);
+        } else {
+          // New paginated format
+          setOrders(data.orders || []);
+          setPagination(data.pagination);
+          setTotalPages(data.pagination?.totalPages || 1);
+          setTotalCount(data.pagination?.totalCount || 0);
+        }
+        
+        // New order detection (only for real-time updates on current page)
+        if (currentPage === 1) {
+          const currentIds = (data.orders || data || []).map(o => o._id);
+          console.log('[Dashboard] Current orders:', currentIds.length, 'Previous:', prevOrderIds.current.length);
+          
+          if (prevOrderIds.current.length && currentIds.length > prevOrderIds.current.length) {
+            const added = currentIds.filter(id => !prevOrderIds.current.includes(id));
+            if (added.length) {
+              console.log('[Dashboard] New orders detected:', added);
+              setNewOrderIds(ids => [...ids, ...added]);
+              setNewOrderToastIds(ids => [...ids, ...added]);
+            }
+            setNewOrderAnim(true);
+            setTimeout(() => setNewOrderAnim(false), 1200);
+          }
+          prevOrderIds.current = currentIds;
+        }
+        
+      } catch (err) {
         setActionMsg('Failed to fetch orders. Please check your connection.');
         setTimeout(() => setActionMsg(''), 2500);
         console.error('Failed to fetch orders', err);
-      });
+      } finally {
+        setLoading(false);
+      }
     };
+    
     fetchOrders();
-    const interval = setInterval(fetchOrders, 3000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const filterOrders = (orders) => {
-    const now = new Date();
-    return orders.filter(order => {
-      if (!order.time) return false;
-      const orderDateStr = new Date(order.time).toISOString().slice(0,10);
-      if (orderFilter === 'today') return orderDateStr === now.toISOString().slice(0,10);
-      if (orderFilter === 'yesterday') {
-        const yesterday = new Date(now);
-        yesterday.setDate(now.getDate() - 1);
-        return orderDateStr === yesterday.toISOString().slice(0,10);
-      }
-      if (orderFilter === 'week') {
-        const weekAgo = new Date(now);
-        weekAgo.setDate(now.getDate() - 7);
-        return orderDateStr >= weekAgo.toISOString().slice(0,10) && orderDateStr <= now.toISOString().slice(0,10);
-      }
-      if (orderFilter === 'month') return orderDateStr.slice(0,7) === now.toISOString().slice(0,7);
-      if (orderFilter === 'custom' && customDate) return orderDateStr === customDate;
-      return true;
-    });
-  };
+    // Only auto-refresh if on first page to avoid disrupting pagination
+    let interval;
+    if (currentPage === 1) {
+      interval = setInterval(fetchOrders, 3000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [currentPage, orderFilter, orderStatusFilter, customDate]);
 
   const processOrders = (orders) => {
-    let filtered = filterOrders(orders);
-    if (orderStatusFilter !== 'all') {
-      filtered = filtered.filter(order => {
-        // Normalize status to lowercase, fallback to 'pending' if missing
-        const status = (order.status || 'pending').toLowerCase();
-        return status === orderStatusFilter.toLowerCase();
-      });
-    }
-    return filtered;
+    // Apply status filtering (if not done on backend)
+    if (orderStatusFilter === 'all') return orders;
+    return orders.filter(order => order.status === orderStatusFilter);
   };
 
   const downloadSalesReport = () => {
-    const filteredOrders = filterOrders(orders);
+    const filteredOrders = processOrders(orders);
     const doc = new jsPDF();
   // Title, logo/icon, and subtitle
   doc.setFontSize(22);
@@ -147,8 +171,9 @@ function Dashboard() {
   const headers = ['Order No.', 'Customer', 'Total (AED)', 'Status', 'Time'];
   let startY = 52;
   // Calculate summary stats
-  const totalOrders = filteredOrders.length;
-  const totalSales = filteredOrders.reduce((sum, order) => sum + (Number(order.total) || 0), 0);
+  // Summary calculations
+  const totalOrders = totalCount || orders.length;
+  const totalSales = orders.reduce((sum, order) => sum + (Number(order.total) || 0), 0);
   const avgSale = totalOrders ? (totalSales / totalOrders) : 0;
   doc.setFontSize(12);
   doc.setTextColor(40, 120, 60);
@@ -186,6 +211,7 @@ function Dashboard() {
   doc.setFont(undefined, 'normal');
   doc.setTextColor(30, 30, 30);
   startY += 12;
+    // Generate PDF content
     filteredOrders.forEach((order, idx) => {
       const orderId = order.orderNumber || order.id || order._id;
       // Format time
@@ -528,6 +554,90 @@ function Dashboard() {
             </div>
           ))}
         </div>
+        
+        {/* Pagination Controls */}
+        {pagination && pagination.totalPages > 1 && (
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: '10px',
+            marginTop: '20px',
+            padding: '20px',
+            background: 'var(--white)',
+            borderRadius: '12px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+          }}>
+            <button 
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+              style={{
+                ...buttonStyle,
+                opacity: currentPage === 1 ? 0.5 : 1,
+                cursor: currentPage === 1 ? 'not-allowed' : 'pointer'
+              }}
+            >
+              First
+            </button>
+            
+            <button 
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              style={{
+                ...buttonStyle,
+                opacity: currentPage === 1 ? 0.5 : 1,
+                cursor: currentPage === 1 ? 'not-allowed' : 'pointer'
+              }}
+            >
+              Previous
+            </button>
+            
+            <span style={{ 
+              padding: '0 15px', 
+              fontWeight: 'bold',
+              color: 'var(--primary)'
+            }}>
+              Page {currentPage} of {totalPages}
+            </span>
+            
+            <span style={{ 
+              fontSize: '0.9rem', 
+              color: '#666' 
+            }}>
+              ({totalCount} total orders)
+            </span>
+            
+            <button 
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={currentPage >= totalPages}
+              style={{
+                ...buttonStyle,
+                opacity: currentPage >= totalPages ? 0.5 : 1,
+                cursor: currentPage >= totalPages ? 'not-allowed' : 'pointer'
+              }}
+            >
+              Next
+            </button>
+            
+            <button 
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages}
+              style={{
+                ...buttonStyle,
+                opacity: currentPage === totalPages ? 0.5 : 1,
+                cursor: currentPage === totalPages ? 'not-allowed' : 'pointer'
+              }}
+            >
+              Last
+            </button>
+            
+            {loading && (
+              <div style={{ marginLeft: '10px', color: '#666' }}>
+                Loading...
+              </div>
+            )}
+          </div>
+        )}
         
       </div>
     </div>

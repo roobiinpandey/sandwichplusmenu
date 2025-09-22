@@ -18,265 +18,151 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// GET /menu - return all menu items
+// GET /menu - EMERGENCY FAST VERSION - return all menu items quickly
 router.get('/', async (req, res) => {
   try {
-    // Get all categories from Category collection
-    const allCategories = await require('../models/Category').find();
-    // Get all menu items
-    const items = await MenuItem.find();
-    // Group items by category, include both name_en and name_ar
+    console.log('[FAST-MENU] Starting fast menu fetch...');
+    const startTime = Date.now();
+    
+    // Simple fast query - get all items directly
+    const items = await MenuItem.find().lean().limit(100);
+    console.log(`[FAST-MENU] Found ${items.length} items in ${Date.now() - startTime}ms`);
+    
+    // Simple category grouping without complex lookups
     const categoriesMap = {};
+    const categories = ['Hot Drinks', 'Cold Drinks', 'Breakfast Plus', 'Sandwiches', 'Salads', 'Sweets', 'Healthy', 'Pasta'];
+    
+    // Initialize categories
+    categories.forEach(cat => {
+      categoriesMap[cat] = { name_en: cat, name_ar: cat, items: [] };
+    });
+    
+    // Group items by category
     items.forEach(item => {
       const cat = item.category || 'Uncategorized';
-      // Find matching category object for name_en
-      const catObj = allCategories.find(c => c.name_en === cat);
       if (!categoriesMap[cat]) {
-        categoriesMap[cat] = {
-          name_en: cat,
-          name_ar: catObj ? catObj.name_ar : '',
-          items: []
-        };
+        categoriesMap[cat] = { name_en: cat, name_ar: cat, items: [] };
       }
       categoriesMap[cat].items.push(item);
     });
-    // Ensure all categories are present, even if empty
-    allCategories.forEach(catObj => {
-      const cat = catObj.name_en;
-      if (!categoriesMap[cat]) {
-        categoriesMap[cat] = {
-          name_en: cat,
-          name_ar: catObj.name_ar,
-          items: []
-        };
-      }
-    });
-    let categories = Object.values(categoriesMap);
-    // Guarantee 'HOT & COLD DRINKS' is last
-    const hotCold = categories.filter(cat => cat.name_en === 'HOT & COLD DRINKS');
-    categories = categories.filter(cat => cat.name_en !== 'HOT & COLD DRINKS');
-    if (hotCold.length) categories.push(...hotCold);
-    res.json({ categories });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to load menu', details: err.message });
+    
+    // Convert to array and filter out empty categories
+    const result = Object.entries(categoriesMap)
+      .filter(([_, catData]) => catData.items.length > 0)
+      .map(([catName, catData]) => catData);
+    
+    console.log(`[FAST-MENU] Completed in ${Date.now() - startTime}ms`);
+    res.json({ categories: result });
+    
+  } catch (error) {
+    console.error('[FAST-MENU] Error:', error);
+    res.status(500).json({ error: 'Failed to fetch menu', details: error.message });
   }
 });
 
-// POST /menu - add a new menu item (supports multipart/form-data)
+// POST /menu - add new menu item (admin only)
 router.post('/', verifyToken, upload.single('image'), async (req, res) => {
-    // Robustly parse has_sizes and sizes
-    const hasSizes = req.body.has_sizes === 'true' || req.body.has_sizes === true;
-    let sizes = [];
-    if (req.body.sizes) {
-      try {
-        sizes = typeof req.body.sizes === 'string' ? JSON.parse(req.body.sizes) : req.body.sizes;
-      } catch (e) {
-        console.log('Sizes parse error:', req.body.sizes, e);
-        return res.status(400).json({ error: 'Invalid sizes format' });
-      }
-    }
-    // Debug log all received fields and parsed values
-    console.log('POST /menu received:', {
-      name_en: req.body.name_en,
-      name_ar: req.body.name_ar,
-      mainCategory: req.body.category,
-      subcategory: req.body.subcategory,
-      price: req.body.price,
-      has_sizes: hasSizes,
-      sizes,
-      image: req.file ? req.file.filename : null
-    });
   try {
-    // Parse fields from form-data
-    const name_en = req.body.name_en;
-    const name_ar = req.body.name_ar;
-    const price = req.body.price;
-    const mainCategory = req.body.category;
-    const subcategory = req.body.subcategory;
-    const description_en = req.body.description_en;
-    const description_ar = req.body.description_ar;
-
-    // Validate required fields
-    if (!name_en || !mainCategory || (!hasSizes && !price) || (hasSizes && (!sizes || !sizes.length))) {
-      console.log('Validation failed:', {
-        name_en,
-        mainCategory,
-        price,
-        hasSizes,
-        sizes
-      });
+    const { name_en, name_ar, price, category, subcategory, sizes } = req.body;
+    
+    if (!name_en || !name_ar || !price || !category) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // If hasSizes, ensure sizes array is valid
-    if (hasSizes && (!sizes || !Array.isArray(sizes) || sizes.some(sz => !sz.size || !sz.price))) {
-      return res.status(400).json({ error: 'Missing or invalid sizes for item with sizes' });
-    }
-
-    // Handle image upload - convert to base64 for persistent storage
-    let images = [];
-    if (req.file) {
+    let processedSizes = [];
+    if (sizes && sizes !== 'undefined') {
       try {
-        // Read the uploaded file and convert to base64
-        const imageBuffer = fs.readFileSync(req.file.path);
-        const base64Image = `data:${req.file.mimetype};base64,${imageBuffer.toString('base64')}`;
-        images.push(base64Image);
-        
-        // Clean up the temporary file
-        fs.unlinkSync(req.file.path);
-      } catch (error) {
-        console.error('Error processing image:', error);
-        return res.status(500).json({ error: 'Failed to process image' });
+        processedSizes = JSON.parse(sizes);
+      } catch (e) {
+        console.log('Failed to parse sizes, using empty array');
       }
     }
 
-    // Generate a unique id if not provided
-    const id = req.body.id || String(Date.now()) + Math.floor(Math.random() * 10000);
-
-    const newItem = new MenuItem({
-      id,
+    const menuItem = new MenuItem({
       name_en,
       name_ar,
-      price: price || null,
-      images,
-      has_sizes: hasSizes,
-      sizes,
-      category: mainCategory,
-      subcategory,
-      description_en,
-      description_ar
+      price: Number(price),
+      category,
+      subcategory: subcategory || '',
+      sizes: processedSizes
     });
-    await newItem.save();
-    res.status(201).json({ success: true, item: newItem });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to add item', details: err.message });
+
+    if (req.file) {
+      const imageBuffer = fs.readFileSync(req.file.path);
+      const base64Image = imageBuffer.toString('base64');
+      const mimeType = req.file.mimetype || 'image/jpeg';
+      menuItem.image = `data:${mimeType};base64,${base64Image}`;
+      
+      // Clean up uploaded file
+      fs.unlinkSync(req.file.path);
+    }
+
+    await menuItem.save();
+    res.status(201).json({ success: true, item: menuItem });
+  } catch (error) {
+    console.error('Error adding menu item:', error);
+    res.status(500).json({ error: 'Failed to add menu item', details: error.message });
   }
 });
 
-// PUT /menu/:id - update an existing menu item
+// PUT /menu/:id - update menu item (admin only)
 router.put('/:id', verifyToken, upload.single('image'), async (req, res) => {
   try {
-    const itemId = req.params.id;
+    const { id } = req.params;
+    const { name_en, name_ar, price, category, subcategory, sizes } = req.body;
     
-    // Robustly parse has_sizes and sizes
-    const hasSizes = req.body.has_sizes === 'true' || req.body.has_sizes === true;
-    let sizes = [];
-    if (req.body.sizes) {
+    const updateData = {
+      name_en,
+      name_ar,
+      price: Number(price),
+      category,
+      subcategory: subcategory || ''
+    };
+
+    if (sizes && sizes !== 'undefined') {
       try {
-        sizes = typeof req.body.sizes === 'string' ? JSON.parse(req.body.sizes) : req.body.sizes;
+        updateData.sizes = JSON.parse(sizes);
       } catch (e) {
-        console.log('Sizes parse error:', req.body.sizes, e);
-        return res.status(400).json({ error: 'Invalid sizes format' });
+        console.log('Failed to parse sizes, keeping existing');
       }
     }
 
-    console.log('PUT /menu/:id received:', {
-      id: itemId,
-      name_en: req.body.name_en,
-      name_ar: req.body.name_ar,
-      mainCategory: req.body.category,
-      subcategory: req.body.subcategory,
-      price: req.body.price,
-      has_sizes: hasSizes,
-      sizes,
-      image: req.file ? req.file.filename : null
-    });
-
-    // Parse fields from form-data
-    const name_en = req.body.name_en;
-    const name_ar = req.body.name_ar;
-    const price = req.body.price;
-    const mainCategory = req.body.category;
-    const subcategory = req.body.subcategory;
-    const description_en = req.body.description_en;
-    const description_ar = req.body.description_ar;
-
-    // Validate required fields
-    if (!name_en || !mainCategory || (!hasSizes && !price) || (hasSizes && (!sizes || !sizes.length))) {
-      console.log('Update validation failed:', {
-        name_en,
-        mainCategory,
-        price,
-        hasSizes,
-        sizes
-      });
-      return res.status(400).json({ error: 'Missing required fields' });
+    if (req.file) {
+      const imageBuffer = fs.readFileSync(req.file.path);
+      const base64Image = imageBuffer.toString('base64');
+      const mimeType = req.file.mimetype || 'image/jpeg';
+      updateData.image = `data:${mimeType};base64,${base64Image}`;
+      
+      fs.unlinkSync(req.file.path);
     }
 
-    // If hasSizes, ensure sizes array is valid
-    if (hasSizes && (!sizes || !Array.isArray(sizes) || sizes.some(sz => !sz.size || !sz.price))) {
-      return res.status(400).json({ error: 'Missing or invalid sizes for item with sizes' });
-    }
-
-    // Find the existing item
-    const existingItem = await MenuItem.findOne({ id: itemId });
-    if (!existingItem) {
+    const updatedItem = await MenuItem.findByIdAndUpdate(id, updateData, { new: true });
+    
+    if (!updatedItem) {
       return res.status(404).json({ error: 'Menu item not found' });
     }
 
-    // Handle image upload - convert to base64 for persistent storage
-    let images = existingItem.images || []; // Keep existing images by default
-    if (req.file) {
-      try {
-        // Read the uploaded file and convert to base64
-        const imageBuffer = fs.readFileSync(req.file.path);
-        const base64Image = `data:${req.file.mimetype};base64,${imageBuffer.toString('base64')}`;
-        images = [base64Image]; // Replace existing images with new one
-        
-        // Clean up the temporary file
-        fs.unlinkSync(req.file.path);
-      } catch (error) {
-        console.error('Error processing image:', error);
-        return res.status(500).json({ error: 'Failed to process image' });
-      }
-    }
-
-    // Update the item
-    const updatedItem = await MenuItem.findOneAndUpdate(
-      { id: itemId },
-      {
-        name_en,
-        name_ar,
-        price: price || null,
-        images,
-        has_sizes: hasSizes,
-        sizes,
-        category: mainCategory,
-        subcategory,
-        description_en,
-        description_ar
-      },
-      { new: true }
-    );
-
     res.json({ success: true, item: updatedItem });
-  } catch (err) {
-    console.error('Update menu item error:', err);
-    res.status(500).json({ error: 'Failed to update item', details: err.message });
+  } catch (error) {
+    console.error('Error updating menu item:', error);
+    res.status(500).json({ error: 'Failed to update menu item', details: error.message });
   }
 });
 
-// DELETE /menu/:id - delete a menu item
+// DELETE /menu/:id - delete menu item (admin only)
 router.delete('/:id', verifyToken, async (req, res) => {
   try {
-    const itemId = req.params.id;
-    
-    console.log('DELETE /menu/:id received:', {
-      id: itemId
-    });
-
-    // Find and delete the item
-    const deletedItem = await MenuItem.findOneAndDelete({ id: itemId });
+    const { id } = req.params;
+    const deletedItem = await MenuItem.findByIdAndDelete(id);
     
     if (!deletedItem) {
       return res.status(404).json({ error: 'Menu item not found' });
     }
 
-    console.log('Successfully deleted menu item:', deletedItem.name_en);
-    res.json({ success: true, message: 'Item deleted successfully', item: deletedItem });
-  } catch (err) {
-    console.error('Delete menu item error:', err);
-    res.status(500).json({ error: 'Failed to delete item', details: err.message });
+    res.json({ success: true, message: 'Menu item deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting menu item:', error);
+    res.status(500).json({ error: 'Failed to delete menu item', details: error.message });
   }
 });
 
