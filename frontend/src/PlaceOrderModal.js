@@ -78,22 +78,16 @@ export default function PlaceOrderModal({ show, order, lang, customerName, setCu
             margin: '18px 32px 0 32px', 
             background: toast.type === 'error' ? '#d32f2f' : '#323232', 
             color: '#fff', 
-            padding: '16px 32px', 
+            padding: '12px 32px', 
             borderRadius: 10, 
             fontWeight: 700, 
             fontSize: '1.1rem', 
             opacity: 0.97, 
             textAlign: 'center', 
             minWidth: 180, 
-            boxShadow: toast.type === 'error' 
-              ? '0 4px 16px rgba(211,47,47,0.25)' 
-              : '0 2px 8px rgba(50,50,50,0.10)',
-            border: toast.type === 'error' ? '2px solid #fff' : 'none',
-            animation: 'shake 0.5s ease-in-out'
+            boxShadow: '0 2px 8px rgba(211,47,47,0.10)'
           }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-              {toast.type === 'error' && '⚠️'} {toast.message}
-            </div>
+            {toast.message}
           </div>
         )}
         <div className="dialog-body" style={{ padding: '28px 36px', background: '#f8f9fa' }}>
@@ -158,13 +152,17 @@ export default function PlaceOrderModal({ show, order, lang, customerName, setCu
                 <div style={{ 
                   color: '#d32f2f', 
                   fontSize: '0.875rem', 
-                  fontWeight: 600, 
-                  marginTop: 4,
+                  fontWeight: 500, 
+                  marginTop: 6,
+                  padding: '8px 12px',
+                  backgroundColor: '#fdf2f2',
+                  border: '1px solid #f5c2c7',
+                  borderRadius: 6,
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 4
+                  gap: 6
                 }}>
-                  ⚠️ {lang === 'ar' ? 'يرجى إدخال اسمك' : 'Please enter your name'}
+                  ⚠️ {lang === 'ar' ? 'يرجى إدخال اسمك' : 'Please enter your Name'}
                 </div>
               )}
             </div>
