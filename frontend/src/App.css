@@ -512,7 +512,7 @@ cursor: pointer;
 font-weight: 500;
 }
 .back-btn {
-background: var(--primary);
+background: #52a373; /* Light dark green - more visible than primary */
 color: var(--white);
 border: none;
 padding: 10px 15px;
@@ -521,9 +521,10 @@ cursor: pointer;
 font-weight: 600;
 align-self: flex-start;
 margin-bottom: 20px;
+box-shadow: 0 2px 6px rgba(0,0,0,0.15); /* Add shadow for better visibility */
 }
 .back-btn:hover {
-background: var(--primary-dark);
+background: #449a66; /* Slightly darker on hover */
 }
 /* Modal Styling from provided HTML */
 .modal {
@@ -678,11 +679,4 @@ background: var(--primary-dark);
 body[data-lang="ar"] .phone-input {
   direction: ltr;
   text-align: right;
-}
-
-/* Store Closed Banner Animation */
-@keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.8; }
-  100% { opacity: 1; }
 }

@@ -229,11 +229,12 @@ const ProductDetailPage = ({ categories, lang, addToCart, openCart, openPlaceOrd
               padding: '10px 20px',
               fontSize: '1rem',
               borderRadius: '8px',
-              background: 'var(--primary)',
+              background: '#52a373', /* Light dark green - more visible */
               color: '#fff',
               border: 'none',
               cursor: 'pointer',
-              transition: 'background 0.3s ease'
+              transition: 'background 0.3s ease',
+              boxShadow: '0 2px 6px rgba(0,0,0,0.15)' /* Better visibility */
             }}
           >
             {lang === 'ar' ? 'رجوع' : 'Back'}

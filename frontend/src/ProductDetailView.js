@@ -72,7 +72,7 @@ const ProductDetailView = ({ categories, lang, addToCart, openCart, openPlaceOrd
     </div>
   <div style={{ padding: '20px', width: '100%', background: '#fff', borderRadius: '0', boxShadow: '0 4px 16px rgba(0,0,0,0.1)' }}>
       <div style={{ marginBottom: 20, textAlign: lang === 'ar' ? 'right' : 'left', borderBottom: '1px solid #e0e0e0', paddingBottom: '15px' }}>
-        <button onClick={() => { if (fromCategory) { navigate('/', { state: { activeCategory: fromCategory } }); } else { navigate(-1); } }} className="back-btn" style={{ marginRight: lang === 'ar' ? 0 : '10px', marginLeft: lang === 'ar' ? '10px' : 0, padding: '10px 20px', fontSize: '1rem', borderRadius: '8px', background: 'var(--primary)', color: '#fff', border: 'none', cursor: 'pointer', transition: 'background 0.3s ease' }}>{lang === 'ar' ? 'رجوع' : 'Back'}</button>
+        <button onClick={() => { if (fromCategory) { navigate('/', { state: { activeCategory: fromCategory } }); } else { navigate(-1); } }} className="back-btn" style={{ marginRight: lang === 'ar' ? 0 : '10px', marginLeft: lang === 'ar' ? '10px' : 0, padding: '10px 20px', fontSize: '1rem', borderRadius: '8px', background: '#52a373', color: '#fff', border: 'none', cursor: 'pointer', transition: 'background 0.3s ease', boxShadow: '0 2px 6px rgba(0,0,0,0.15)' }}>{lang === 'ar' ? 'رجوع' : 'Back'}</button>
       </div>
       <div className="order-summary" id="orderSummary" style={{ position: 'relative', width: '100%', background: '#fff', borderRadius: '12px', boxShadow: '0 2px 12px rgba(0,0,0,0.08)', padding: '24px 18px', zIndex: 100 }}>
         <div className="detail-content">
