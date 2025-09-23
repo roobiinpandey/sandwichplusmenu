@@ -22,7 +22,7 @@ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-background-color: rgba(200, 230, 201, 0.25); /* 25% light green background */
+background-color: #a3e7a440; /* 25% light green background */
 }
 :root {
 --primary: #2a5c45;
