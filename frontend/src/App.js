@@ -262,7 +262,7 @@ function App() {
 								setOrder={setOrder}
 								addToCart={handleAddToCart}
 								openCart={() => setShowCart(true)}
-								openPlaceOrder={() => setShowPlaceOrder(true)}
+								openPlaceOrder={null} // MenuPage handles its own PlaceOrderModal
 								setLang={setLang}
 							/>
 						} />
