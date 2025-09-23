@@ -6,6 +6,12 @@ import MenuItem from './MenuItem';
 import OrderSummaryModal from './components/OrderSummaryModal';
 import PlaceOrderModal from './components/PlaceOrderModal';
 import OrderSuccessModal from './components/OrderSuccessModal';
+
+// Configure axios base URL for API calls - ensure consistency with App.js
+const API_BASE_URL = 'https://swp-backend-x36i.onrender.com';
+console.log('[DEBUG] MenuPage - Using API Base URL:', API_BASE_URL);
+axios.defaults.baseURL = API_BASE_URL;
+axios.defaults.withCredentials = false;
 // EmptyCartModal uses same style as OrderSummaryModal
 function EmptyCartModal({ show, lang, onClose }) {
   if (!show) return null;
@@ -77,13 +83,42 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
         status: 'Pending'
       };
       setShowPlaceOrder(false);
-      try { console.log('[DEBUG] POST /orders payload', orderData); } catch (e) {}
+      console.log('[DEBUG] MenuPage POST /orders payload', JSON.stringify(orderData, null, 2));
+      
+      // Add detailed debugging before the request
+      console.log('[DEBUG] MenuPage - About to send POST request to:', axios.defaults.baseURL + '/orders');
+      console.log('[DEBUG] MenuPage - Axios config:', { 
+        baseURL: axios.defaults.baseURL,
+        withCredentials: axios.defaults.withCredentials 
+      });
+      
       await axios.post('/orders', orderData);
       setOrderSuccess({ show: true, orderId: '#' + Math.floor(10000 + Math.random() * 90000), customerName: nameToUse, total: orderData.total });
       setOrder([]);
       setCustomerName('');
       setNotes('');
     } catch (err) {
+      console.error('[DEBUG] MenuPage - Order placement failed:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status,
+        config: {
+          url: err.config?.url,
+          method: err.config?.method,
+          baseURL: err.config?.baseURL,
+          data: err.config?.data
+        },
+        request: err.request ? 'Request was made but no response received' : 'No request made'
+      });
+      
+      // Check if it's a network error vs server error
+      if (!err.response) {
+        console.error('[DEBUG] MenuPage - Network error - no response received');
+        console.error('[DEBUG] MenuPage - Request details:', err.request);
+      } else {
+        console.error('[DEBUG] MenuPage - Server responded with error:', err.response.status, err.response.data);
+      }
+      
       setToast({ show: true, message: lang === 'ar' ? 'فشل تقديم الطلب. حاول مرة أخرى.' : 'Failed to place order. Please try again.', type: 'error' });
     }
   };
