@@ -22,6 +22,11 @@ function Dashboard() {
     return localStorage.getItem('storeCloseTime') || '22:00';
   });
   
+  // Edit time modal state
+  const [showEditTimeModal, setShowEditTimeModal] = useState(false);
+  const [tempOpenTime, setTempOpenTime] = useState('');
+  const [tempCloseTime, setTempCloseTime] = useState('');
+  
   // Sync store status with backend
   const updateStoreStatus = async (newStatus) => {
     try {
@@ -53,6 +58,35 @@ function Dashboard() {
     };
     loadStoreStatus();
   }, []);
+  
+  // Handle edit time modal
+  const handleEditTime = () => {
+    setTempOpenTime(openTime);
+    setTempCloseTime(closeTime);
+    setShowEditTimeModal(true);
+  };
+
+  const handleSaveTime = async () => {
+    setOpenTime(tempOpenTime);
+    setCloseTime(tempCloseTime);
+    localStorage.setItem('storeOpenTime', tempOpenTime);
+    localStorage.setItem('storeCloseTime', tempCloseTime);
+    await updateStoreStatus({ openTime: tempOpenTime, closeTime: tempCloseTime });
+    setShowEditTimeModal(false);
+  };
+
+  const handleCancelEdit = () => {
+    setShowEditTimeModal(false);
+    setTempOpenTime('');
+    setTempCloseTime('');
+  };
+
+  const formatTimeDisplay = (time) => {
+    const [hours, minutes] = time.split(':');
+    const hour12 = parseInt(hours) % 12 || 12;
+    const ampm = parseInt(hours) >= 12 ? 'PM' : 'AM';
+    return `${hour12}:${minutes} ${ampm}`;
+  };
   
   const [downloadMsg] = useState('');
   const [newOrderIds, setNewOrderIds] = useState([]);
@@ -312,32 +346,38 @@ function Dashboard() {
         padding: '18px 32px',
         fontWeight: 600
       }}>
-        <label htmlFor="store-open" style={{ fontWeight: 700 }}>Store Operation Hour:</label>
-        <input 
-          id="store-open" 
-          type="time" 
-          value={openTime}
-          onChange={(e) => {
-            const newTime = e.target.value;
-            setOpenTime(newTime);
-            localStorage.setItem('storeOpenTime', newTime);
-            updateStoreStatus({ openTime: newTime });
-          }}
-          style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', fontWeight: 600 }} 
-        />
-        <span style={{ fontWeight: 700 }}>to</span>
-        <input 
-          id="store-close" 
-          type="time" 
-          value={closeTime}
-          onChange={(e) => {
-            const newTime = e.target.value;
-            setCloseTime(newTime);
-            localStorage.setItem('storeCloseTime', newTime);
-            updateStoreStatus({ closeTime: newTime });
-          }}
-          style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', fontWeight: 600 }} 
-        />
+        <label style={{ fontWeight: 700 }}>Store Operation Hours:</label>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '12px',
+          background: '#f8f9fa',
+          padding: '10px 16px',
+          borderRadius: '8px',
+          border: '1px solid #e9ecef'
+        }}>
+          <span style={{ fontWeight: 600, color: '#2a5c45' }}>
+            {formatTimeDisplay(openTime)} - {formatTimeDisplay(closeTime)}
+          </span>
+          <button
+            onClick={handleEditTime}
+            style={{
+              padding: '6px 12px',
+              background: '#007bff',
+              color: 'white',
+              border: 'none',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              fontSize: '12px',
+              fontWeight: 600,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}
+          >
+            ✏️ Edit Time
+          </button>
+        </div>
         
         {/* ON/OFF Slider */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginLeft: '18px' }}>
@@ -659,6 +699,102 @@ function Dashboard() {
         </div>
         
       </div>
+      
+      {/* Edit Time Modal */}
+      {showEditTimeModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            padding: '24px',
+            maxWidth: '400px',
+            width: '90%',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.3)'
+          }}>
+            <h3 style={{ margin: '0 0 20px 0', color: '#2a5c45', fontWeight: 700 }}>
+              Edit Store Operation Hours
+            </h3>
+            
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>
+                Opening Time:
+              </label>
+              <input
+                type="time"
+                value={tempOpenTime}
+                onChange={(e) => setTempOpenTime(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '6px',
+                  border: '1px solid #ddd',
+                  fontSize: '16px'
+                }}
+              />
+            </div>
+            
+            <div style={{ marginBottom: '24px' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontWeight: 600 }}>
+                Closing Time:
+              </label>
+              <input
+                type="time"
+                value={tempCloseTime}
+                onChange={(e) => setTempCloseTime(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  borderRadius: '6px',
+                  border: '1px solid #ddd',
+                  fontSize: '16px'
+                }}
+              />
+            </div>
+            
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button
+                onClick={handleCancelEdit}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: '#6c757d',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: 600
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveTime}
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: '#2a5c45',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: 600
+                }}
+              >
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
 
   );
