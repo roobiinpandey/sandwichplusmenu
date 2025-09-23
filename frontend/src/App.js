@@ -141,12 +141,7 @@ function App() {
 		const handlePlaceOrder = async (payload = {}) => {
 			try { console.log('[TRACE] handlePlaceOrder called', payload); } catch (e) {}
 			const nameToUse = payload.customer || customerName;
-			if (!nameToUse.trim()) {
-				setToast({ show: true, message: lang === 'ar' ? 'يرجى إدخال اسمك' : 'Please enter your name', type: 'error', context: 'placeOrder' });
-				if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
-				toastTimeoutRef.current = setTimeout(() => setToast({ show: false, message: '', type: 'default', context: null }), 3000);
-				return;
-			}
+			// Note: Name validation is now handled inline in PlaceOrderModal
 		try {
 			const orderData = {
 				customer: nameToUse,
@@ -209,10 +204,7 @@ function App() {
 				// Hide toast when customer starts typing name
 				const handleCustomerNameChange = (value) => {
 					setCustomerName(value);
-					if (toast.show && toast.message === (lang === 'ar' ? 'يرجى إدخال اسمك' : 'Please enter your name')) {
-						setToast({ show: false, message: '', type: 'default' });
-						if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
-					}
+					// Name validation toast clearing is now handled in PlaceOrderModal
 				};
 
 		// Load menu data
