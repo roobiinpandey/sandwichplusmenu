@@ -38,7 +38,22 @@ function App() {
 
 	// Cart handlers
 	const handleRemoveItem = (idx) => setOrder(o => o.filter((_, i) => i !== idx));
-	const handleChangeQuantity = (idx, delta) => setOrder(o => o.map((it, i) => i === idx ? { ...it, quantity: Math.max(1, it.quantity + delta) } : it));
+	const handleChangeQuantity = (idx, delta) => {
+		setOrder(o => {
+			const newOrder = [...o];
+			if (newOrder[idx]) {
+				const newQuantity = newOrder[idx].quantity + delta;
+				if (newQuantity <= 0) {
+					// Remove item if quantity drops to 0 or below
+					return newOrder.filter((_, i) => i !== idx);
+				} else {
+					// Update quantity
+					newOrder[idx] = { ...newOrder[idx], quantity: newQuantity };
+				}
+			}
+			return newOrder;
+		});
+	};
 	const handleClearOrder = () => setOrder([]);
 
 	const lastAddRef = useRef({ key: null, t: 0 });
