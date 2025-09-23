@@ -117,17 +117,21 @@ function App() {
 			if (existing) {
 				newQuantity += existing.quantity;
 			}
-			// Always return a single entry for this product+size+bread, preserving all product properties
+			// Always return a single entry for this product+size+bread, preserving essential properties
 			return [
 				...filtered,
 				{
-					...product, // Preserve all properties including bread, breadDisplay, category, etc.
 					id: product.id,
 					name_en: product.name_en,
 					name_ar: product.name_ar,
 					price,
 					quantity: newQuantity,
-					size: sizeLabel
+					size: sizeLabel,
+					// Preserve bread selection data for Breakfast Plus items
+					...(product.breadDisplay && { breadDisplay: product.breadDisplay }),
+					...(product.bread && { bread: product.bread }),
+					// Preserve category for reference
+					...(product.category && { category: product.category })
 				}
 			];
 		});
@@ -154,12 +158,49 @@ function App() {
 				status: 'Pending'
 			};
 			setShowPlaceOrder(false);
-			try { console.log('[DEBUG] POST /orders payload', orderData); } catch(e) {}
-			await axios.post('/orders', orderData);
-			setOrderSuccess({ show: true, orderId: '#' + Math.floor(10000 + Math.random() * 90000), customerName: nameToUse, total: orderData.total });
-			setOrder([]);
-			setCustomerName('');
-			setNotes('');
+			console.log('[DEBUG] POST /orders payload', JSON.stringify(orderData, null, 2));
+			
+			// Add detailed debugging before the request
+			console.log('[DEBUG] About to send POST request to:', axios.defaults.baseURL + '/orders');
+			console.log('[DEBUG] Axios config:', { 
+				baseURL: axios.defaults.baseURL,
+				withCredentials: axios.defaults.withCredentials 
+			});
+			
+			// Add error handling with detailed logging
+			try {
+				const response = await axios.post('/orders', orderData);
+				console.log('[DEBUG] Order placed successfully', response.data);
+				setOrderSuccess({ show: true, orderId: '#' + Math.floor(10000 + Math.random() * 90000), customerName: nameToUse, total: orderData.total });
+				setOrder([]);
+				setCustomerName('');
+				setNotes('');
+			} catch (apiError) {
+				console.error('[DEBUG] Order placement failed:', {
+					message: apiError.message,
+					response: apiError.response?.data,
+					status: apiError.response?.status,
+					config: {
+						url: apiError.config?.url,
+						method: apiError.config?.method,
+						baseURL: apiError.config?.baseURL,
+						data: apiError.config?.data
+					},
+					request: apiError.request ? 'Request was made but no response received' : 'No request made'
+				});
+				
+				// Check if it's a network error vs server error
+				if (!apiError.response) {
+					console.error('[DEBUG] Network error - no response received');
+					console.error('[DEBUG] Request details:', apiError.request);
+				} else {
+					console.error('[DEBUG] Server responded with error:', apiError.response.status, apiError.response.data);
+				}
+				
+				setToast({ show: true, message: lang === 'ar' ? 'فشل تقديم الطلب. حاول مرة أخرى.' : 'Failed to place order. Please try again.', type: 'error', context: 'placeOrder' });
+				if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+				toastTimeoutRef.current = setTimeout(() => setToast({ show: false, message: '', type: 'default', context: null }), 3000);
+			}
 		} catch (err) {
 			setToast({ show: true, message: lang === 'ar' ? 'فشل تقديم الطلب. حاول مرة أخرى.' : 'Failed to place order. Please try again.', type: 'error' });
 		}
