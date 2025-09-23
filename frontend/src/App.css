@@ -20,6 +20,10 @@ padding: 0;
 box-sizing: border-box;
 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+
+body {
+background-color: rgba(200, 230, 201, 0.25); /* 25% light green background */
+}
 :root {
 --primary: #2a5c45;
 --primary-dark: #1e4535;
@@ -43,17 +47,18 @@ transition: all 0.3s ease;
   max-width: 1600px;
   margin: 0 auto;
   min-height: 100vh;
+  background-color: rgba(200, 230, 201, 0.25); /* 25% light green background */
 }
 
 /* Wide Screen Body Optimization */
 @media (min-width: 1600px) {
   body {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e8f5e9 100%);
+    background: linear-gradient(135deg, rgba(200, 230, 201, 0.3) 0%, rgba(200, 230, 201, 0.15) 100%);
   }
   
   .app-container, .App {
     box-shadow: 0 0 50px rgba(0,0,0,0.08);
-    background: #f8f9fa;
+    background: rgba(200, 230, 201, 0.25);
   }
 }
 .header {
@@ -238,11 +243,11 @@ background-color: rgba(255,255,255,0.1);
 /* Floating Cart Optimization */
 .order-summary {
   position: fixed;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.95); /* Slightly transparent white to show green background */
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.15);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(200, 230, 201, 0.3);
   z-index: 1000;
   transition: all 0.3s ease;
 }

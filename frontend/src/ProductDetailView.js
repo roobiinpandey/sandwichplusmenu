@@ -60,7 +60,7 @@ const ProductDetailView = ({ categories, lang, addToCart, openCart, openPlaceOrd
   }
   const handleSwipe = direction => {
     if (idx < 0) return; let newIdx = idx; const isRTL = lang === 'ar'; if (direction === 'left') newIdx = isRTL ? idx + 1 : idx - 1; else if (direction === 'right') newIdx = isRTL ? idx - 1 : idx + 1; if (newIdx >= 0 && newIdx < allItems.length) { const target = allItems[newIdx]; if (target && target.id !== undefined && target.id !== null) { navigate(`/detail/${target.id}${fromCategory ? `?category=${encodeURIComponent(fromCategory)}` : ''}`); } } };
-  return (<div className="detail-page" {...swipeHandlers} style={{ direction: lang === 'ar' ? 'rtl' : 'ltr', minHeight: '100vh', background: '#fff' }}>
+  return (<div className="detail-page" {...swipeHandlers} style={{ direction: lang === 'ar' ? 'rtl' : 'ltr', minHeight: '100vh', background: 'rgba(200, 230, 201, 0.25)' }}>
     <div className="header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--primary)', padding: '15px 20px', marginBottom: '20px', color: '#fff' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
         <div className="logo"><i className="fas fa-utensils"></i>{lang === 'ar' ? (<span className="arabic" style={{ fontWeight: 700, marginRight: '8px' }}>ساندويتش بلس+</span>) : (<span className="english" style={{ fontWeight: 700, marginLeft: '8px' }}>SANDWICH PLUS+</span>)}</div>
@@ -70,7 +70,7 @@ const ProductDetailView = ({ categories, lang, addToCart, openCart, openPlaceOrd
         <button className={`lang-btn${lang === 'ar' ? ' active' : ''}`} onClick={() => typeof setLang === 'function' && setLang('ar')} data-lang="ar" style={{ background: lang === 'ar' ? '#fff' : 'transparent', color: lang === 'ar' ? 'var(--primary)' : '#fff', border: '1px solid #fff', padding: '4px 8px', borderRadius: '4px', cursor: 'pointer' }}>AR</button>
       </div>
     </div>
-  <div style={{ padding: '20px', width: '100%', background: '#fff', borderRadius: '0', boxShadow: '0 4px 16px rgba(0,0,0,0.1)' }}>
+  <div style={{ padding: '20px', width: '100%', background: 'rgba(200, 230, 201, 0.25)', borderRadius: '0', boxShadow: '0 4px 16px rgba(0,0,0,0.1)' }}>
       <div style={{ marginBottom: 20, textAlign: lang === 'ar' ? 'right' : 'left', borderBottom: '1px solid #e0e0e0', paddingBottom: '15px' }}>
         <button onClick={() => { if (fromCategory) { navigate('/', { state: { activeCategory: fromCategory } }); } else { navigate(-1); } }} className="back-btn" style={{ marginRight: lang === 'ar' ? 0 : '10px', marginLeft: lang === 'ar' ? '10px' : 0, padding: '10px 20px', fontSize: '1rem', borderRadius: '8px', background: '#52a373', color: '#fff', border: 'none', cursor: 'pointer', transition: 'background 0.3s ease', boxShadow: '0 2px 6px rgba(0,0,0,0.15)' }}>{lang === 'ar' ? 'رجوع' : 'Back'}</button>
       </div>
