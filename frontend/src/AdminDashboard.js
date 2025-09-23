@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Dashboard.css';
 import MenuItemModal from './components/MenuItemModal';
+import { notificationService } from './services/OrderNotificationService';
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -28,6 +29,10 @@ function Dashboard() {
   const prevOrderIds = useRef([]);
   const [newOrderAnim, setNewOrderAnim] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+
+  // Notification settings
+  const [soundNotifications, setSoundNotifications] = useState(true);
+  const [notificationVolume, setNotificationVolume] = useState(0.7);
 
   // Helper for status badge styling (use normalized lowercase)
   const statusColor = (status) => {
@@ -120,6 +125,12 @@ function Dashboard() {
           setTimeout(() => setNewOrderAnim(false), 1200);
           const newIds = ids.filter(id => !prevOrderIds.current.includes(id));
           setNewOrderIds(prev => [...prev, ...newIds]);
+          
+          // Play sound notification for new orders
+          if (soundNotifications && newIds.length > 0) {
+            console.log('[NOTIFICATION] Playing sound for', newIds.length, 'new order(s)');
+            notificationService.playOrderAlert();
+          }
         }
         prevOrderIds.current = ids;
       });
@@ -127,6 +138,26 @@ function Dashboard() {
   fetchOrders();
     const interval = setInterval(fetchOrders, 5000);
     return () => clearInterval(interval);
+  }, [soundNotifications]); // Add soundNotifications to dependencies
+
+  // Initialize notification service
+  useEffect(() => {
+    // Request notification permissions for web browsers
+    notificationService.requestPermission();
+    
+    // Enable notifications on component mount
+    const enableNotifications = () => {
+      notificationService.enable();
+    };
+    
+    // Enable on any user interaction
+    document.addEventListener('click', enableNotifications, { once: true });
+    document.addEventListener('touchstart', enableNotifications, { once: true });
+    
+    return () => {
+      document.removeEventListener('click', enableNotifications);
+      document.removeEventListener('touchstart', enableNotifications);
+    };
   }, []);
 
   const filterOrders = (ordersList) => {
@@ -217,6 +248,63 @@ function Dashboard() {
         >
           Orders
         </button>
+        
+        {/* Notification Settings Toggle */}
+        <button 
+          style={{ 
+            background: soundNotifications ? 'var(--success)' : '#666',
+            color: 'var(--white)',
+            padding: '12px 24px',
+            borderRadius: '8px',
+            border: 'none',
+            fontWeight: '700',
+            fontSize: '1.1rem',
+            cursor: 'pointer',
+            boxShadow: soundNotifications 
+              ? '0 2px 8px rgba(76,175,80,0.15)' 
+              : '0 2px 8px rgba(102,102,102,0.15)',
+            transition: 'all 0.2s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }} 
+          onClick={() => {
+            setSoundNotifications(!soundNotifications);
+            if (!soundNotifications) {
+              // Enable and test the notification
+              notificationService.enable();
+              notificationService.playNotification('ding');
+            }
+          }}
+          title={soundNotifications ? 'Disable sound notifications' : 'Enable sound notifications'}
+        >
+          🔊 {soundNotifications ? 'Sound ON' : 'Sound OFF'}
+        </button>
+        
+        {/* Test Notification Button */}
+        {soundNotifications && (
+          <button 
+            style={{ 
+              background: '#ff9800',
+              color: 'var(--white)',
+              padding: '12px 24px',
+              borderRadius: '8px',
+              border: 'none',
+              fontWeight: '700',
+              fontSize: '1.1rem',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(255,152,0,0.15)',
+              transition: 'all 0.2s ease'
+            }} 
+            onClick={() => {
+              console.log('[TEST] Playing test notification');
+              notificationService.playOrderAlert();
+            }}
+            title="Test notification sound"
+          >
+            🔔 Test Sound
+          </button>
+        )}
         <a href="/admin-panel" style={{ textDecoration: 'none' }}>
           <button 
             style={{ 

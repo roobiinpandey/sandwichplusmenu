@@ -1,0 +1,129 @@
+<!-- This file generates basic notification sounds using Web Audio API -->
+<!-- You can replace these with professional sound files -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Notification Sounds</title>
+</head>
+<body>
+    <h1>Notification Sound Generator</h1>
+    <p>This generates basic notification sounds. For production, replace with professional audio files.</p>
+    
+    <button onclick="generateNotificationSound()">Generate notification.wav</button>
+    <button onclick="generateOrderAlert()">Generate order-alert.wav</button>
+    <button onclick="generateDing()">Generate ding.wav</button>
+    
+    <script>
+        function generateNotificationSound() {
+            // Create a pleasant notification sound (ascending tones)
+            const audioContext = new AudioContext();
+            const length = audioContext.sampleRate * 1; // 1 second
+            const buffer = audioContext.createBuffer(1, length, audioContext.sampleRate);
+            const data = buffer.getChannelData(0);
+            
+            for (let i = 0; i < length; i++) {
+                const t = i / audioContext.sampleRate;
+                // Two-tone notification
+                const freq1 = 523.25; // C5
+                const freq2 = 659.25; // E5
+                
+                if (t < 0.3) {
+                    data[i] = Math.sin(2 * Math.PI * freq1 * t) * Math.exp(-t * 3) * 0.3;
+                } else if (t < 0.6) {
+                    data[i] = Math.sin(2 * Math.PI * freq2 * (t - 0.3)) * Math.exp(-(t - 0.3) * 3) * 0.3;
+                }
+            }
+            
+            downloadBuffer(buffer, 'notification.wav');
+        }
+        
+        function generateOrderAlert() {
+            // Create an urgent order alert sound
+            const audioContext = new AudioContext();
+            const length = audioContext.sampleRate * 1.5; // 1.5 seconds
+            const buffer = audioContext.createBuffer(1, length, audioContext.sampleRate);
+            const data = buffer.getChannelData(0);
+            
+            for (let i = 0; i < length; i++) {
+                const t = i / audioContext.sampleRate;
+                // Urgent beeping pattern
+                const freq = 880; // A5
+                const beepDuration = 0.2;
+                const pauseDuration = 0.1;
+                const cycle = beepDuration + pauseDuration;
+                const phase = (t % cycle);
+                
+                if (phase < beepDuration) {
+                    data[i] = Math.sin(2 * Math.PI * freq * t) * 0.4;
+                } else {
+                    data[i] = 0;
+                }
+            }
+            
+            downloadBuffer(buffer, 'order-alert.wav');
+        }
+        
+        function generateDing() {
+            // Create a simple ding sound
+            const audioContext = new AudioContext();
+            const length = audioContext.sampleRate * 0.5; // 0.5 seconds
+            const buffer = audioContext.createBuffer(1, length, audioContext.sampleRate);
+            const data = buffer.getChannelData(0);
+            
+            for (let i = 0; i < length; i++) {
+                const t = i / audioContext.sampleRate;
+                const freq = 1047; // C6
+                data[i] = Math.sin(2 * Math.PI * freq * t) * Math.exp(-t * 4) * 0.5;
+            }
+            
+            downloadBuffer(buffer, 'ding.wav');
+        }
+        
+        function downloadBuffer(buffer, filename) {
+            const length = buffer.length;
+            const arrayBuffer = new ArrayBuffer(44 + length * 2);
+            const view = new DataView(arrayBuffer);
+            
+            // WAV header
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, 36 + length * 2, true);
+            writeString(view, 8, 'WAVE');
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, 1, true);
+            view.setUint32(24, buffer.sampleRate, true);
+            view.setUint32(28, buffer.sampleRate * 2, true);
+            view.setUint16(32, 2, true);
+            view.setUint16(34, 16, true);
+            writeString(view, 36, 'data');
+            view.setUint32(40, length * 2, true);
+            
+            // Convert float samples to 16-bit PCM
+            const channelData = buffer.getChannelData(0);
+            let offset = 44;
+            for (let i = 0; i < length; i++) {
+                const sample = Math.max(-1, Math.min(1, channelData[i]));
+                view.setInt16(offset, sample * 0x7FFF, true);
+                offset += 2;
+            }
+            
+            const blob = new Blob([arrayBuffer], { type: 'audio/wav' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function writeString(view, offset, string) {
+            for (let i = 0; i < string.length; i++) {
+                view.setUint8(offset + i, string.charCodeAt(i));
+            }
+        }
+    </script>
+</body>
+</html>
