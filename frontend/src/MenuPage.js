@@ -95,26 +95,45 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
   });
   const [showClosedModal, setShowClosedModal] = useState(false);
 
+  // Order modal states
+  const [showPlaceOrder, setShowPlaceOrder] = useState(false);
+  const [showCart, setShowCart] = useState(false);
+  const [showEmptyCartModal, setShowEmptyCartModal] = useState(false);
+  const [showOrderSuccess, setShowOrderSuccess] = useState(false);
+  const [successOrderData, setSuccessOrderData] = useState(null);
+
   // Load store status from backend
   useEffect(() => {
     const loadStoreStatus = async () => {
       try {
         const response = await axios.get('/store/status');
-        setStoreStatus(response.data);
+        const newStatus = response.data;
+        setStoreStatus(newStatus);
+        
+        // If store is closed, immediately block any active ordering process
+        if (!newStatus.isOpen || !isStoreCurrentlyOpen(newStatus)) {
+          setShowPlaceOrder(false);
+          setShowCart(false);
+          // Show closed modal if user was in the middle of ordering
+          if (showPlaceOrder || showCart) {
+            setShowClosedModal(true);
+          }
+        }
       } catch (error) {
         console.error('Failed to load store status:', error);
       }
     };
     loadStoreStatus();
     
-    // Check every minute if store should be closed based on time
-    const interval = setInterval(loadStoreStatus, 60000);
+    // Check every 10 seconds for immediate response to admin changes
+    const interval = setInterval(loadStoreStatus, 10000);
     return () => clearInterval(interval);
-  }, []);
+  }, [showPlaceOrder, showCart]); // Add dependencies to detect when user is ordering
 
   // Check if store is currently open
-  const isStoreCurrentlyOpen = () => {
-    if (!storeStatus.isOpen) return false; // Manual override
+  const isStoreCurrentlyOpen = (statusOverride = null) => {
+    const currentStatus = statusOverride || storeStatus;
+    if (!currentStatus.isOpen) return false; // Manual override
     
     const now = new Date();
     const currentTime = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
@@ -126,8 +145,8 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
     };
     
     const currentMinutes = timeToMinutes(currentTime);
-    const openMinutes = timeToMinutes(storeStatus.openTime);
-    const closeMinutes = timeToMinutes(storeStatus.closeTime);
+    const openMinutes = timeToMinutes(currentStatus.openTime);
+    const closeMinutes = timeToMinutes(currentStatus.closeTime);
     
     // Handle overnight hours (e.g., 22:00 to 07:30)
     if (closeMinutes < openMinutes) {
@@ -135,6 +154,16 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
     }
     
     return currentMinutes >= openMinutes && currentMinutes <= closeMinutes;
+  };
+
+  // Function to check store status before allowing order operations
+  const checkStoreStatusAndProceed = (callback) => {
+    if (!isStoreCurrentlyOpen()) {
+      setShowClosedModal(true);
+      return false;
+    }
+    callback();
+    return true;
   };
 
   
@@ -157,14 +186,11 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
 
   // Helper to get category key for current language
   const getCategoryKey = cat => lang === 'ar' ? (cat.name_ar || cat.name_en) : cat.name_en;
-  // Add state for placing order
-  const [showCart, setShowCart] = useState(false);
-  const [showPlaceOrder, setShowPlaceOrder] = useState(false);
-  const [showEmptyCartModal, setShowEmptyCartModal] = useState(false);
+  
+  // Customer order state (moved to top with other states)
   const [customerName, setCustomerName] = useState('');
   const [notes, setNotes] = useState('');
   const [toast, setToast] = useState({ show: false, message: '', type: 'default' });
-  const [orderSuccess, setOrderSuccess] = useState(null);
 
   // Cart handlers
   const handleRemoveItem = (idx) => setOrder(o => o.filter((_, i) => i !== idx));
@@ -173,6 +199,14 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
 
   const handlePlaceOrder = async (payload = {}) => {
     try { console.log('[TRACE] MenuPage.handlePlaceOrder called', payload); } catch (e) {}
+    
+    // Check store status one more time before processing order
+    if (!isStoreCurrentlyOpen()) {
+      setShowPlaceOrder(false);
+      setShowClosedModal(true);
+      return;
+    }
+    
     const nameToUse = payload.customer || customerName;
     // Note: Name validation is now handled inline in PlaceOrderModal
     try {
@@ -433,16 +467,14 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
           </div>
         </div>
         <div className="order-actions" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          <button className="order-btn view-order-btn" onClick={() => setShowCart(true)} style={{ fontWeight: 600, fontSize: '1rem', padding: '10px 0' }}>
+          <button className="order-btn view-order-btn" onClick={() => checkStoreStatusAndProceed(() => setShowCart(true))} style={{ fontWeight: 600, fontSize: '1rem', padding: '10px 0' }}>
             {lang === 'ar' ? 'عرض الطلب بالكامل' : 'View Full Order'}
           </button>
           <button className="order-btn place-order-btn" onClick={() => {
             if (order.length === 0) {
               setShowEmptyCartModal(true);
-            } else if (!isStoreCurrentlyOpen()) {
-              setShowClosedModal(true);
             } else {
-              setShowPlaceOrder(true);
+              checkStoreStatusAndProceed(() => setShowPlaceOrder(true));
             }
           }} style={{ fontWeight: 600, fontSize: '1rem', padding: '10px 0' }}>
             {lang === 'ar' ? 'تقديم الطلب' : 'Place Order'}
@@ -462,11 +494,7 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
         onClearOrder={handleClearOrder}
         onPlaceOrder={() => {
           setShowCart(false);
-          if (!isStoreCurrentlyOpen()) {
-            setShowClosedModal(true);
-          } else {
-            setShowPlaceOrder(true);
-          }
+          checkStoreStatusAndProceed(() => setShowPlaceOrder(true));
         }}
       />
       <StoreClosedModal

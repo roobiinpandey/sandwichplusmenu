@@ -679,3 +679,10 @@ body[data-lang="ar"] .phone-input {
   direction: ltr;
   text-align: right;
 }
+
+/* Store Closed Banner Animation */
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.8; }
+  100% { opacity: 1; }
+}
