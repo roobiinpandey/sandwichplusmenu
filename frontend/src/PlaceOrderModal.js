@@ -162,7 +162,7 @@ export default function PlaceOrderModal({ show, order, lang, customerName, setCu
                   alignItems: 'center',
                   gap: 6
                 }}>
-                  ⚠️ {lang === 'ar' ? 'يرجى إدخال اسمك' : 'Please enter your Name'}
+                  ⚠️ {lang === 'ar' ? 'يرجى إدخال اسمك' : 'Please enter your name'}
                 </div>
               )}
             </div>
