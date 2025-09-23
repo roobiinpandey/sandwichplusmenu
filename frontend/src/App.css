@@ -209,7 +209,7 @@ border-bottom-color: var(--accent);
 background-color: rgba(255,255,255,0.1);
 }
 .menu-container {
-padding: 20px 15px 80px;
+padding: 20px 15px 100px; /* Increased bottom padding from 80px to 100px to account for floating cart */
 min-height: 70vh;
 }
 .menu-section {
