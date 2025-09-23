@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 const PlaceOrderModal = ({ show, order = [], lang, customerName, setCustomerName, onCancel, onConfirm, onRemoveItem, onChangeQuantity, onClearOrder, notes, setNotes }) => {
   const [phone, setPhone] = useState('');
   const [phoneError, setPhoneError] = useState('');
+  const [nameError, setNameError] = useState(false);
   const phoneRef = React.useRef(null);
   const notesRef = useRef(null);
   const dialogRef = useRef(null);
@@ -22,6 +23,12 @@ const PlaceOrderModal = ({ show, order = [], lang, customerName, setCustomerName
     setTimeout(() => onCancel && onCancel(), 190);
   };
   const handleConfirm = () => {
+    // Check if name is empty
+    if (!customerName || !customerName.trim()) {
+      setNameError(true);
+      return;
+    }
+    
     if (order.length === 0) {
       setPhoneError(lang === 'ar' ? 'سلة الطلبات فارغة' : 'Your order is empty');
       return;
@@ -36,6 +43,7 @@ const PlaceOrderModal = ({ show, order = [], lang, customerName, setCustomerName
       return;
     }
     setPhoneError('');
+    setNameError(false);
   // Persist any notes from the textarea to parent state before confirming
   const currentNotes = notesRef.current ? notesRef.current.value : (notes || '');
   try { setNotes && setNotes(currentNotes); } catch (err) {}
@@ -89,8 +97,31 @@ const PlaceOrderModal = ({ show, order = [], lang, customerName, setCustomerName
         <div style={{ marginTop: 14 }}>
           <h3>{lang === 'ar' ? 'تفاصيل العميل' : 'Customer Details'}</h3>
           <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <label style={{ fontWeight: 700 }} htmlFor="po-name">{lang === 'ar' ? 'الاسم' : 'Name'}</label>
-            <input id="po-name" name="customerName" type="text" autoComplete="off" spellCheck={false} autoCapitalize="words" value={customerName} onChange={e => setCustomerName(e.target.value)} placeholder={lang === 'ar' ? 'أدخل اسمك' : 'Enter your name'} aria-label={lang === 'ar' ? 'الاسم' : 'Name'} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); } }} />
+            <label style={{ fontWeight: 700, color: nameError ? '#d32f2f' : 'inherit' }} htmlFor="po-name">{lang === 'ar' ? 'الاسم' : 'Name'}</label>
+            <input 
+              id="po-name" 
+              name="customerName" 
+              type="text" 
+              autoComplete="off" 
+              spellCheck={false} 
+              autoCapitalize="words" 
+              value={customerName} 
+              onChange={e => {
+                setCustomerName(e.target.value);
+                if (nameError && e.target.value.trim()) {
+                  setNameError(false);
+                }
+              }} 
+              placeholder={nameError ? "Please enter your name" : (lang === 'ar' ? 'أدخل اسمك' : 'Enter your name')} 
+              aria-label={lang === 'ar' ? 'الاسم' : 'Name'} 
+              style={{
+                border: nameError ? '2px solid #d32f2f' : '1px solid #e6e6f0',
+                backgroundColor: nameError ? '#fff5f5' : 'white',
+                padding: '8px 12px',
+                borderRadius: '6px'
+              }}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); } }} 
+            />
           </div>
           <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
             <label style={{ fontWeight: 700 }}>{lang === 'ar' ? 'رقم الهاتف' : 'Phone Number'}</label>
