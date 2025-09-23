@@ -588,17 +588,6 @@ app.get('/db-stats', async (req, res) => {
   }
 });
 
-app.delete('/menu/:id', authenticateToken, async (req, res) => {
-  try {
-    const itemId = req.params.id;
-    const item = await MenuItem.findOneAndDelete({ id: itemId });
-    if (!item) return res.status(404).json({ error: 'Menu item not found' });
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to delete item' });
-  }
-});
-
 // Example usage of logger
 app.use((err, req, res, next) => {
   logger.error(err.stack);
