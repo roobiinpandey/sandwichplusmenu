@@ -207,8 +207,9 @@ function AdminPanel() {
                 <p className="subtitle">Sign in to manage menu and orders</p>
               </div>
             </div>
-            <label style={{ display: 'block', marginTop: 14 }}>
+            <label style={{ display: 'block', marginTop: 14 }} htmlFor="admin-login-id">
               <input
+                id="admin-login-id"
                 type="text"
                 name="loginId"
                 autoComplete="off"
@@ -218,8 +219,9 @@ function AdminPanel() {
                 autoFocus
               />
             </label>
-            <label style={{ display: 'block', marginTop: 10 }}>
+            <label style={{ display: 'block', marginTop: 10 }} htmlFor="admin-menu-password">
               <input
+                id="admin-menu-password"
                 type="password"
                 name="menuPassword"
                 autoComplete="new-password"
@@ -242,6 +244,7 @@ function AdminPanel() {
             <>
               <div className="menu-controls" style={{ display: 'flex', gap: '16px', marginBottom: '24px', alignItems: 'center' }}>
                 <input
+                  id="menu-search"
                   type="text"
                   placeholder="Search menu items..."
                   value={searchTerm}

@@ -399,7 +399,7 @@ function Dashboard() {
           <button style={orderFilter === 'yesterday' ? activeButtonStyle : buttonStyle} onClick={() => setOrderFilter('yesterday')}>Yesterday</button>
           <button style={orderFilter === 'week' ? activeButtonStyle : buttonStyle} onClick={() => setOrderFilter('week')}>This Week</button>
           <button style={orderFilter === 'month' ? activeButtonStyle : buttonStyle} onClick={() => setOrderFilter('month')}>This Month</button>
-          <input type="date" value={customDate} onChange={e => { setCustomDate(e.target.value); setOrderFilter('custom'); }} style={{ ...buttonStyle, padding: '8px 16px', width: '220px', color: 'var(--primary)', background: 'var(--white)', border: '2px solid var(--accent)', fontSize: '1.1rem', borderRadius: '8px', boxShadow: '0 2px 8px rgba(76,175,80,0.10)' }} />
+          <input id="custom-date" type="date" value={customDate} onChange={e => { setCustomDate(e.target.value); setOrderFilter('custom'); }} style={{ ...buttonStyle, padding: '8px 16px', width: '220px', color: 'var(--primary)', background: 'var(--white)', border: '2px solid var(--accent)', fontSize: '1.1rem', borderRadius: '8px', boxShadow: '0 2px 8px rgba(76,175,80,0.10)' }} />
         </div>
         <div style={{ marginBottom: '24px', display: 'flex', gap: '14px', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>

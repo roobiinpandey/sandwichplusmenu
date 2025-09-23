@@ -111,26 +111,29 @@ function MenuItemModal({ mode, item, onClose, onSuccess, categories }) {
       </div>
       <div className="dialog-body">
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <label>
+          <label htmlFor="menu-name-en">
             Name (EN):
             <input
+              id="menu-name-en"
               type="text"
               value={formData.name_en}
               onChange={(e) => setFormData({ ...formData, name_en: e.target.value })}
               required
             />
             </label>
-            <label>
+            <label htmlFor="menu-name-ar">
               Name (AR):
               <input
+                id="menu-name-ar"
                 type="text"
                 value={formData.name_ar}
                 onChange={(e) => setFormData({ ...formData, name_ar: e.target.value })}
               />
           </label>
-          <label>
+          <label htmlFor="menu-main-category">
             Main Category:
             <select
+              id="menu-main-category"
               value={formData.mainCategory}
               onChange={e => setFormData({ ...formData, mainCategory: e.target.value })}
               required
@@ -142,9 +145,10 @@ function MenuItemModal({ mode, item, onClose, onSuccess, categories }) {
             </select>
             {errors.mainCategory && <div style={{ color: '#d32f2f', fontWeight: 600 }}>{errors.mainCategory}</div>}
           </label>
-          <label>
+          <label htmlFor="menu-subcategory">
             Subcategory:
             <select
+              id="menu-subcategory"
               value={formData.subcategory}
               onChange={e => setFormData({ ...formData, subcategory: e.target.value })}
               style={{ width: '100%', padding: '8px', borderRadius: '6px', border: '1px solid #ccc', marginTop: '4px' }}
@@ -160,17 +164,19 @@ function MenuItemModal({ mode, item, onClose, onSuccess, categories }) {
             </select>
             {errors.subcategory && <div style={{ color: '#d32f2f', fontWeight: 600 }}>{errors.subcategory}</div>}
           </label>
-          <label>
+          <label htmlFor="menu-description-en">
             Description (EN):
             <input
+              id="menu-description-en"
               type="text"
               value={formData.description_en}
               onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
             />
           </label>
-          <label>
+          <label htmlFor="menu-description-ar">
             Description (AR):
             <input
+              id="menu-description-ar"
               type="text"
               value={formData.description_ar}
               onChange={(e) => setFormData({ ...formData, description_ar: e.target.value })}
@@ -178,23 +184,39 @@ function MenuItemModal({ mode, item, onClose, onSuccess, categories }) {
           </label>
           <label>
                 <label style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <input type="checkbox" checked={hasSizes} onChange={e => {
+                  <input 
+                    id="menu-has-sizes"
+                    type="checkbox" 
+                    checked={hasSizes} 
+                    onChange={e => {
                     setHasSizes(e.target.checked);
                     if (!e.target.checked) {
                       setFormData({ ...formData, sizes: [{ size: '', price: '' }] });
                     }
                   }} />
-                  This item has multiple sizes
+                  <label htmlFor="menu-has-sizes">This item has multiple sizes</label>
                 </label>
                 {hasSizes ? (
                   <label>
                     Sizes & Prices:
                     {formData.sizes.map((sz, idx) => (
                       <div key={idx} style={{ display: 'flex', gap: 8, marginBottom: 6 }}>
-                        <input type="text" placeholder="Size (e.g. Small)" value={sz.size} onChange={e => {
+                        <input 
+                          id={`menu-size-${idx}`}
+                          type="text" 
+                          placeholder="Size (e.g. Small)" 
+                          value={sz.size} 
+                          onChange={e => {
                           const arr = [...formData.sizes]; arr[idx].size = e.target.value; setFormData({ ...formData, sizes: arr });
                         }} style={{ width: 90 }} />
-                        <input type="number" placeholder="Price" value={sz.price} min="0" step="0.01" onChange={e => {
+                        <input 
+                          id={`menu-size-price-${idx}`}
+                          type="number" 
+                          placeholder="Price" 
+                          value={sz.price} 
+                          min="0" 
+                          step="0.01" 
+                          onChange={e => {
                           const arr = [...formData.sizes]; arr[idx].price = e.target.value; setFormData({ ...formData, sizes: arr });
                         }} style={{ width: 80 }} />
                         <button type="button" onClick={() => setFormData({ ...formData, sizes: formData.sizes.filter((_, i) => i !== idx) })} style={{ color: '#ff6b6b', fontWeight: 700, border: 'none', background: 'none', cursor: 'pointer' }}>✕</button>
@@ -204,20 +226,31 @@ function MenuItemModal({ mode, item, onClose, onSuccess, categories }) {
                     {errors.sizes && <div style={{ color: '#d32f2f', fontWeight: 600 }}>{errors.sizes}</div>}
                   </label>
                 ) : (
-                  <label>
+                  <label htmlFor="menu-simple-price">
                     Price:
-                    <input type="number" placeholder="Price" value={price} min="0" step="0.01" onChange={e => setPrice(e.target.value)} style={{ width: 120 }} />
+                    <input 
+                      id="menu-simple-price"
+                      type="number" 
+                      placeholder="Price" 
+                      value={price} 
+                      min="0" 
+                      step="0.01" 
+                      onChange={e => setPrice(e.target.value)} 
+                      style={{ width: 120 }} />
                     {errors.price && <div style={{ color: '#d32f2f', fontWeight: 600 }}>{errors.price}</div>}
                   </label>
                 )}
+          <label htmlFor="menu-image">
             Image {mode === 'add' ? '(required)' : '(optional)'}:
             <input
+              id="menu-image"
               type="file"
               accept="image/*"
               onChange={(e) => setFormData({ ...formData, imageFile: e.target.files[0] })}
               required={mode === 'add'}
             />
             {errors.imageFile && <div style={{ color: '#d32f2f', fontWeight: 600 }}>{errors.imageFile}</div>}
+          </label>
             {mode === 'edit' && formData.images?.length > 0 && (
               <div style={{ marginTop: '6px' }}>
                 <span>Current image:</span><br />
