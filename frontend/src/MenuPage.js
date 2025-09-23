@@ -27,9 +27,115 @@ function EmptyCartModal({ show, lang, onClose }) {
   );
 }
 
+// Store Closed Modal
+function StoreClosedModal({ show, lang, onClose, storeStatus }) {
+  if (!show) return null;
+  
+  const formatTime = (time) => {
+    const [hours, minutes] = time.split(':');
+    const hour12 = parseInt(hours) > 12 ? parseInt(hours) - 12 : parseInt(hours);
+    const ampm = parseInt(hours) >= 12 ? 'PM' : 'AM';
+    return `${hour12 === 0 ? 12 : hour12}:${minutes} ${ampm}`;
+  };
+  
+  return (
+    <div className="modal fade-in" onClick={onClose} style={{ 
+      position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', 
+      display: 'flex', alignItems: 'center', justifyContent: 'center', 
+      zIndex: 9999, background: 'rgba(0,0,0,0.5)' 
+    }}>
+      <div className="modal-content" onClick={e => e.stopPropagation()} style={{
+        background: '#fff', borderRadius: 12, padding: '24px', 
+        maxWidth: '400px', margin: '20px', boxShadow: '0 8px 32px rgba(0,0,0,0.2)'
+      }}>
+        <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <div style={{ fontSize: '48px', marginBottom: 16 }}>🔒</div>
+          <h2 style={{ color: '#d32f2f', marginBottom: 12, fontSize: '1.5rem', fontWeight: 700 }}>
+            {lang === 'ar' ? 'آسفون، نحن مغلقون اليوم' : 'Sorry, we\'re closed for today'}
+          </h2>
+          <div style={{ color: '#666', fontSize: '1.1rem', marginBottom: 18 }}>
+            {lang === 'ar' ? 'ساعات العمل:' : 'Store Operating Hours:'}
+          </div>
+          <div style={{ 
+            background: '#f8f9fa', padding: '16px', borderRadius: 8, 
+            fontSize: '1.2rem', fontWeight: 600, color: '#2a5c45'
+          }}>
+            {formatTime(storeStatus.openTime)} - {formatTime(storeStatus.closeTime)}
+          </div>
+          <div style={{ marginTop: 16, color: '#888', fontSize: '0.95rem' }}>
+            {lang === 'ar' ? 'يرجى العودة خلال ساعات العمل' : 'Please visit us during operating hours'}
+          </div>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <button 
+            onClick={onClose} 
+            style={{ 
+              background: '#2a5c45', color: '#fff', borderRadius: 8, 
+              padding: '12px 24px', fontWeight: 600, border: 'none', 
+              cursor: 'pointer', fontSize: '1rem'
+            }}
+          >
+            {lang === 'ar' ? 'موافق' : 'Okay'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 
 export default function MenuPage({ categories, lang, order, setOrder, addToCart, openCart, openPlaceOrder, setLang }) {
   const navigate = useNavigate();
+
+  // Store status state
+  const [storeStatus, setStoreStatus] = useState({
+    isOpen: true,
+    openTime: '07:30',
+    closeTime: '22:00'
+  });
+  const [showClosedModal, setShowClosedModal] = useState(false);
+
+  // Load store status from backend
+  useEffect(() => {
+    const loadStoreStatus = async () => {
+      try {
+        const response = await axios.get('/store/status');
+        setStoreStatus(response.data);
+      } catch (error) {
+        console.error('Failed to load store status:', error);
+      }
+    };
+    loadStoreStatus();
+    
+    // Check every minute if store should be closed based on time
+    const interval = setInterval(loadStoreStatus, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Check if store is currently open
+  const isStoreCurrentlyOpen = () => {
+    if (!storeStatus.isOpen) return false; // Manual override
+    
+    const now = new Date();
+    const currentTime = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+    
+    // Convert times to minutes for easier comparison
+    const timeToMinutes = (time) => {
+      const [hours, minutes] = time.split(':').map(Number);
+      return hours * 60 + minutes;
+    };
+    
+    const currentMinutes = timeToMinutes(currentTime);
+    const openMinutes = timeToMinutes(storeStatus.openTime);
+    const closeMinutes = timeToMinutes(storeStatus.closeTime);
+    
+    // Handle overnight hours (e.g., 22:00 to 07:30)
+    if (closeMinutes < openMinutes) {
+      return currentMinutes >= openMinutes || currentMinutes <= closeMinutes;
+    }
+    
+    return currentMinutes >= openMinutes && currentMinutes <= closeMinutes;
+  };
 
   
   // Category tabs - use location state if available
@@ -336,6 +442,8 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
           <button className="order-btn place-order-btn" onClick={() => {
             if (order.length === 0) {
               setShowEmptyCartModal(true);
+            } else if (!isStoreCurrentlyOpen()) {
+              setShowClosedModal(true);
             } else {
               setShowPlaceOrder(true);
             }
@@ -357,8 +465,18 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
         onClearOrder={handleClearOrder}
         onPlaceOrder={() => {
           setShowCart(false);
-          setShowPlaceOrder(true);
+          if (!isStoreCurrentlyOpen()) {
+            setShowClosedModal(true);
+          } else {
+            setShowPlaceOrder(true);
+          }
         }}
+      />
+      <StoreClosedModal
+        show={showClosedModal}
+        lang={lang}
+        storeStatus={storeStatus}
+        onClose={() => setShowClosedModal(false)}
       />
       <PlaceOrderModal
         show={showPlaceOrder}

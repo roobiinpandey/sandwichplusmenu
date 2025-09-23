@@ -9,6 +9,51 @@ function Dashboard() {
   const [orderFilter, setOrderFilter] = useState('today');
   const [customDate, setCustomDate] = useState('');
   const [orderStatusFilter, setOrderStatusFilter] = useState('all');
+  
+  // Store operation state
+  const [storeOpen, setStoreOpen] = useState(() => {
+    const saved = localStorage.getItem('storeOpen');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+  const [openTime, setOpenTime] = useState(() => {
+    return localStorage.getItem('storeOpenTime') || '07:30';
+  });
+  const [closeTime, setCloseTime] = useState(() => {
+    return localStorage.getItem('storeCloseTime') || '22:00';
+  });
+  
+  // Sync store status with backend
+  const updateStoreStatus = async (newStatus) => {
+    try {
+      await axios.post('/store/status', {
+        isOpen: newStatus.isOpen !== undefined ? newStatus.isOpen : storeOpen,
+        openTime: newStatus.openTime || openTime,
+        closeTime: newStatus.closeTime || closeTime
+      });
+    } catch (error) {
+      console.error('Failed to update store status:', error);
+    }
+  };
+
+  // Load store status from backend on component mount
+  useEffect(() => {
+    const loadStoreStatus = async () => {
+      try {
+        const response = await axios.get('/store/status');
+        const status = response.data;
+        setStoreOpen(status.isOpen);
+        setOpenTime(status.openTime);
+        setCloseTime(status.closeTime);
+        localStorage.setItem('storeOpen', JSON.stringify(status.isOpen));
+        localStorage.setItem('storeOpenTime', status.openTime);
+        localStorage.setItem('storeCloseTime', status.closeTime);
+      } catch (error) {
+        console.error('Failed to load store status:', error);
+      }
+    };
+    loadStoreStatus();
+  }, []);
+  
   const [downloadMsg] = useState('');
   const [newOrderIds, setNewOrderIds] = useState([]);
   const [newOrderToastIds, setNewOrderToastIds] = useState([]);
@@ -268,21 +313,74 @@ function Dashboard() {
         fontWeight: 600
       }}>
         <label htmlFor="store-open" style={{ fontWeight: 700 }}>Store Operation Hour:</label>
-        <input id="store-open" type="time" style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', fontWeight: 600 }} />
+        <input 
+          id="store-open" 
+          type="time" 
+          value={openTime}
+          onChange={(e) => {
+            const newTime = e.target.value;
+            setOpenTime(newTime);
+            localStorage.setItem('storeOpenTime', newTime);
+            updateStoreStatus({ openTime: newTime });
+          }}
+          style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', fontWeight: 600 }} 
+        />
         <span style={{ fontWeight: 700 }}>to</span>
-        <input id="store-close" type="time" style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', fontWeight: 600 }} />
-        <button id="store-toggle" style={{
-          background: '#2a5c45',
-          color: '#fff',
-          padding: '10px 24px',
-          borderRadius: '8px',
-          border: 'none',
-          fontWeight: '700',
-          fontSize: '1.1rem',
-          cursor: 'pointer',
-          boxShadow: '0 2px 8px rgba(42,92,69,0.15)',
-          marginLeft: '18px'
-        }}>Turn ON/OFF Orders</button>
+        <input 
+          id="store-close" 
+          type="time" 
+          value={closeTime}
+          onChange={(e) => {
+            const newTime = e.target.value;
+            setCloseTime(newTime);
+            localStorage.setItem('storeCloseTime', newTime);
+            updateStoreStatus({ closeTime: newTime });
+          }}
+          style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', fontWeight: 600 }} 
+        />
+        
+        {/* ON/OFF Slider */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginLeft: '18px' }}>
+          <span style={{ fontWeight: 700, color: storeOpen ? '#2a5c45' : '#666' }}>
+            {storeOpen ? 'STORE OPEN' : 'STORE CLOSED'}
+          </span>
+          <label style={{ position: 'relative', display: 'inline-block', width: '60px', height: '34px' }}>
+            <input 
+              type="checkbox" 
+              checked={storeOpen}
+              onChange={(e) => {
+                const newStatus = e.target.checked;
+                setStoreOpen(newStatus);
+                localStorage.setItem('storeOpen', JSON.stringify(newStatus));
+                updateStoreStatus({ isOpen: newStatus });
+              }}
+              style={{ opacity: 0, width: 0, height: 0 }}
+            />
+            <span style={{
+              position: 'absolute',
+              cursor: 'pointer',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: storeOpen ? '#2a5c45' : '#ccc',
+              transition: '0.4s',
+              borderRadius: '34px',
+            }}>
+              <span style={{
+                position: 'absolute',
+                content: '',
+                height: '26px',
+                width: '26px',
+                left: storeOpen ? '30px' : '4px',
+                bottom: '4px',
+                backgroundColor: 'white',
+                transition: '0.4s',
+                borderRadius: '50%'
+              }}></span>
+            </span>
+          </label>
+        </div>
       </div>
       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, background: 'var(--primary)', color: 'var(--white)', padding: '10px 0', textAlign: 'center', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)', zIndex: 100 }}>
         <h1 style={{ margin: 0, fontWeight: 900, fontSize: '1.6rem', color: 'var(--light)', textShadow: '0 2px 4px rgba(0,0,0,0.1)', display: 'inline-block' }}>Admin Dashboard</h1>

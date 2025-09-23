@@ -136,6 +136,29 @@ app.use('/menu', menuRoutes);
 app.use('/auth', authRoutes);
 app.use(healthRoutes);
 
+// Store status endpoints
+let storeStatus = {
+  isOpen: true,
+  openTime: '07:30',
+  closeTime: '22:00'
+};
+
+// GET store status
+app.get('/store/status', (req, res) => {
+  res.json(storeStatus);
+});
+
+// POST update store status (admin only)
+app.post('/store/status', (req, res) => {
+  const { isOpen, openTime, closeTime } = req.body;
+  if (typeof isOpen === 'boolean') storeStatus.isOpen = isOpen;
+  if (openTime) storeStatus.openTime = openTime;
+  if (closeTime) storeStatus.closeTime = closeTime;
+  
+  logger.info(`Store status updated: ${JSON.stringify(storeStatus)}`);
+  res.json(storeStatus);
+});
+
 // Set mongoose configuration
 mongoose.set('strictQuery', false); // Suppress deprecation warning
 
