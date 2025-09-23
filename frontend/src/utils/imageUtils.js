@@ -3,7 +3,7 @@ const API_BASE_URL = 'https://swp-backend-x36i.onrender.com';
 
 /**
  * Constructs a full image URL from a relative path or returns base64 data URL as-is
- * @param {string} imagePath - The image path from the backend (e.g., "/menu/image/itemId/index" or "data:image/jpeg;base64,...")
+ * @param {string} imagePath - The image path from the backend (e.g., "/images/filename.jpg" or "data:image/jpeg;base64,...")
  * @returns {string} - The full image URL or the base64 data URL or a placeholder if no image
  */
 export const getImageUrl = (imagePath) => {
@@ -11,7 +11,7 @@ export const getImageUrl = (imagePath) => {
     return 'https://via.placeholder.com/300x200?text=No+Image';
   }
   
-  // If it's a base64 data URL, return as-is
+  // If it's a base64 data URL, return as-is (this is the main case now)
   if (imagePath.startsWith('data:image/')) {
     return imagePath;
   }
@@ -23,16 +23,7 @@ export const getImageUrl = (imagePath) => {
   
   // If it starts with a slash, it's a relative path from the backend
   if (imagePath.startsWith('/')) {
-    const fullUrl = API_BASE_URL + imagePath;
-    
-    // Add version parameter for cache control after API optimization
-    // Check if it's the new menu image format
-    if (imagePath.startsWith('/menu/image/')) {
-      const separator = imagePath.includes('?') ? '&' : '?';
-      return fullUrl + separator + 'v=' + Date.now(); // Dynamic version for cache busting
-    }
-    
-    return fullUrl;
+    return API_BASE_URL + imagePath;
   }
   
   // Otherwise, assume it's just a filename and prepend the images path

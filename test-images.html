@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Loading Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-image { 
+            max-width: 300px; 
+            height: 200px; 
+            object-fit: cover; 
+            border: 2px solid #ccc;
+            margin: 10px;
+            display: block;
+        }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Image Loading Test</h1>
+    
+    <h2>Test 1: Direct Backend Image URL</h2>
+    <img 
+        class="test-image" 
+        src="https://swp-backend-x36i.onrender.com/menu/image/17585027587864553/0" 
+        alt="Direct backend image"
+        onload="document.getElementById('result1').innerHTML = '<span class=success>✓ Image loaded successfully</span>'"
+        onerror="document.getElementById('result1').innerHTML = '<span class=error>✗ Failed to load image</span>'"
+    />
+    <div id="result1">Loading...</div>
+    
+    <h2>Test 2: Menu API Response Check</h2>
+    <button onclick="testMenuAPI()">Test Menu API</button>
+    <div id="menu-result"></div>
+    <div id="image-urls"></div>
+    
+    <h2>Test 3: Dynamic Image Loading</h2>
+    <div id="dynamic-images"></div>
+    
+    <script>
+        async function testMenuAPI() {
+            try {
+                const response = await fetch('https://swp-backend-x36i.onrender.com/menu');
+                const data = await response.json();
+                
+                document.getElementById('menu-result').innerHTML = 
+                    '<span class="success">✓ Menu API responded successfully</span>';
+                
+                // Extract first few image URLs
+                const imageUrls = [];
+                for (const category of data.categories) {
+                    for (const item of category.items) {
+                        if (item.images && item.images.length > 0) {
+                            imageUrls.push({
+                                itemName: item.name_en,
+                                imageUrl: item.images[0]
+                            });
+                            if (imageUrls.length >= 3) break;
+                        }
+                    }
+                    if (imageUrls.length >= 3) break;
+                }
+                
+                document.getElementById('image-urls').innerHTML = 
+                    '<h4>Sample Image URLs from API:</h4>' +
+                    imageUrls.map(img => `<div>${img.itemName}: <code>${img.imageUrl}</code></div>`).join('');
+                
+                // Create dynamic images
+                const dynamicDiv = document.getElementById('dynamic-images');
+                dynamicDiv.innerHTML = '<h4>Testing Dynamic Image Loading:</h4>';
+                
+                imageUrls.forEach((img, index) => {
+                    const fullUrl = 'https://swp-backend-x36i.onrender.com' + img.imageUrl;
+                    const imgElement = document.createElement('img');
+                    imgElement.className = 'test-image';
+                    imgElement.src = fullUrl;
+                    imgElement.alt = img.itemName;
+                    
+                    const resultDiv = document.createElement('div');
+                    resultDiv.id = `dynamic-result-${index}`;
+                    resultDiv.innerHTML = 'Loading...';
+                    
+                    imgElement.onload = () => {
+                        resultDiv.innerHTML = `<span class="success">✓ ${img.itemName} loaded</span>`;
+                    };
+                    
+                    imgElement.onerror = () => {
+                        resultDiv.innerHTML = `<span class="error">✗ ${img.itemName} failed to load</span>`;
+                    };
+                    
+                    dynamicDiv.appendChild(document.createElement('div')).appendChild(imgElement);
+                    dynamicDiv.appendChild(resultDiv);
+                });
+                
+            } catch (error) {
+                document.getElementById('menu-result').innerHTML = 
+                    '<span class="error">✗ Menu API failed: ' + error.message + '</span>';
+            }
+        }
+    </script>
+</body>
+</html>

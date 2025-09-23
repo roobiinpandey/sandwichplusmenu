@@ -26,21 +26,8 @@ router.get('/', async (req, res) => {
     // Get all menu items
     const items = await MenuItem.find();
     
-    // Transform items to include image URLs instead of base64 data
-    const transformedItems = items.map(item => {
-      const transformedItem = item.toObject();
-      // Replace base64 images with URLs
-      if (transformedItem.images && transformedItem.images.length > 0) {
-        transformedItem.images = transformedItem.images.map((img, index) => {
-          if (img.startsWith('data:')) {
-            // Return URL path instead of base64
-            return `/menu/image/${item.id}/${index}`;
-          }
-          return img; // Keep if already URL
-        });
-      }
-      return transformedItem;
-    });
+    // Return items with base64 images directly (no transformation needed)
+    const transformedItems = items.map(item => item.toObject());
     
     // Group items by category, include both name_en and name_ar
     const categoriesMap = {};
@@ -76,41 +63,6 @@ router.get('/', async (req, res) => {
     res.json({ categories });
   } catch (err) {
     res.status(500).json({ error: 'Failed to load menu', details: err.message });
-  }
-});
-
-// GET /menu/image/:itemId/:imageIndex - serve individual images
-router.get('/image/:itemId/:imageIndex', async (req, res) => {
-  try {
-    const { itemId, imageIndex } = req.params;
-    const item = await MenuItem.findOne({ id: itemId });
-    
-    if (!item || !item.images || !item.images[imageIndex]) {
-      return res.status(404).json({ error: 'Image not found' });
-    }
-    
-    const base64Image = item.images[imageIndex];
-    
-    if (!base64Image.startsWith('data:')) {
-      return res.status(400).json({ error: 'Invalid image format' });
-    }
-    
-    // Extract mime type and base64 data
-    const [header, data] = base64Image.split(',');
-    const mimeType = header.match(/data:(.*);base64/)[1];
-    const imageBuffer = Buffer.from(data, 'base64');
-    
-    // Set appropriate headers
-    res.set({
-      'Content-Type': mimeType,
-      'Content-Length': imageBuffer.length,
-      'Cache-Control': 'public, max-age=31536000' // Cache for 1 year
-    });
-    
-    res.send(imageBuffer);
-  } catch (err) {
-    console.error('Error serving image:', err);
-    res.status(500).json({ error: 'Failed to serve image', details: err.message });
   }
 });
 
