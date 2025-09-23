@@ -418,33 +418,30 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
             </div>
           );
         })()}
-      </div>
-
-  {/* Empty Cart Modal - overlays above order summary bar */}
-  <EmptyCartModal show={showEmptyCartModal} lang={lang} onClose={() => setShowEmptyCartModal(false)} />
-  {/* Order Summary Bar - positioning now handled by CSS */}
-  <div className="order-summary" id="orderSummary">{}
-        <div className="order-info" style={{ marginBottom: '18px', direction: lang === 'ar' ? 'rtl' : 'ltr' }}>
-          <div className="order-items-count" style={{ 
-            fontWeight: 600, 
-            fontSize: '1.1rem', 
-            marginBottom: '8px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-            {lang === 'ar' ? (
-              <>
-                <span>المنتجات:</span>
-                <span>{order.reduce((sum, item) => sum + item.quantity, 0)}</span>
-              </>
-            ) : (
-              <>
-                <span>Items:</span>
-                <span>{order.reduce((sum, item) => sum + item.quantity, 0)}</span>
-              </>
-            )}
-          </div>
+        
+        {/* Order Summary Bar - now inside menu container for better mobile flow */}
+        <div className="order-summary" id="orderSummary">
+          <div className="order-info" style={{ marginBottom: '18px', direction: lang === 'ar' ? 'rtl' : 'ltr' }}>
+            <div className="order-items-count" style={{ 
+              fontWeight: 600, 
+              fontSize: '1.1rem', 
+              marginBottom: '8px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              {lang === 'ar' ? (
+                <>
+                  <span>المنتجات:</span>
+                  <span>{order.reduce((sum, item) => sum + item.quantity, 0)}</span>
+                </>
+              ) : (
+                <>
+                  <span>Items:</span>
+                  <span>{order.reduce((sum, item) => sum + item.quantity, 0)}</span>
+                </>
+              )}
+            </div>
           <div className="order-total-price" style={{ 
             fontWeight: 700, 
             fontSize: '1.2rem', 
@@ -465,7 +462,7 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
               </>
             )}
           </div>
-        </div>
+          </div>
         <div className="order-actions" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           <button className="order-btn view-order-btn" onClick={() => checkStoreStatusAndProceed(() => setShowCart(true))} style={{ fontWeight: 600, fontSize: '1rem', padding: '10px 0' }}>
             {lang === 'ar' ? 'عرض الطلب بالكامل' : 'View Full Order'}
@@ -479,9 +476,12 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
           }} style={{ fontWeight: 600, fontSize: '1rem', padding: '10px 0' }}>
             {lang === 'ar' ? 'تقديم الطلب' : 'Place Order'}
           </button>
-  {/* Empty Cart Modal - removed duplicate */}
+        </div>
         </div>
       </div>
+
+      {/* Empty Cart Modal - overlays above order summary bar */}
+      <EmptyCartModal show={showEmptyCartModal} lang={lang} onClose={() => setShowEmptyCartModal(false)} />
 
       {/* Modals */}
       <OrderSummaryModal
