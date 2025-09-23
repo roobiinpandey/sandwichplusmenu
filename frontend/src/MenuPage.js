@@ -422,20 +422,8 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
 
   {/* Empty Cart Modal - overlays above order summary bar */}
   <EmptyCartModal show={showEmptyCartModal} lang={lang} onClose={() => setShowEmptyCartModal(false)} />
-  {/* Order Summary Bar - improved positioning to avoid blocking content */}
-  <div className="order-summary" id="orderSummary" style={{ 
-    position: 'fixed', 
-    left: '50%', 
-    bottom: '16px',  /* Reduced from 32px to 16px */
-    transform: 'translateX(-50%)', 
-    width: 'min(340px, calc(100vw - 32px))',  /* Responsive width */
-    background: '#fff', 
-    borderRadius: '12px', 
-    boxShadow: '0 4px 20px rgba(0,0,0,0.15)',  /* Enhanced shadow */
-    padding: '20px 16px',  /* Slightly reduced padding */
-    zIndex: 1000,  /* Higher z-index */
-    transition: 'transform 0.3s ease, opacity 0.3s ease'  /* Smooth transitions */
-  }}>
+  {/* Order Summary Bar - positioning now handled by CSS */}
+  <div className="order-summary" id="orderSummary">{}
         <div className="order-info" style={{ marginBottom: '18px', direction: lang === 'ar' ? 'rtl' : 'ltr' }}>
           <div className="order-items-count" style={{ 
             fontWeight: 600, 
