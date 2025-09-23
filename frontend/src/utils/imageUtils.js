@@ -29,7 +29,7 @@ export const getImageUrl = (imagePath) => {
     // Check if it's the new menu image format
     if (imagePath.startsWith('/menu/image/')) {
       const separator = imagePath.includes('?') ? '&' : '?';
-      return fullUrl + separator + 'v=2025092301'; // Version for Sept 23, 2025 optimization
+      return fullUrl + separator + 'v=' + Date.now(); // Dynamic version for cache busting
     }
     
     return fullUrl;
