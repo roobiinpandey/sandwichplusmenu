@@ -99,8 +99,6 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
   const [showPlaceOrder, setShowPlaceOrder] = useState(false);
   const [showCart, setShowCart] = useState(false);
   const [showEmptyCartModal, setShowEmptyCartModal] = useState(false);
-  const [showOrderSuccess, setShowOrderSuccess] = useState(false);
-  const [successOrderData, setSuccessOrderData] = useState(null);
 
   // Load store status from backend
   useEffect(() => {
@@ -125,10 +123,11 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
     };
     loadStoreStatus();
     
-    // Check every 10 seconds for immediate response to admin changes
+    // Check every 10 seconds for immediate response to admin changes  
     const interval = setInterval(loadStoreStatus, 10000);
     return () => clearInterval(interval);
-  }, [showPlaceOrder, showCart]); // Add dependencies to detect when user is ordering
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showPlaceOrder, showCart]); // Dependencies for detecting when user is ordering
 
   // Check if store is currently open
   const isStoreCurrentlyOpen = (statusOverride = null) => {
@@ -191,6 +190,7 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
   const [customerName, setCustomerName] = useState('');
   const [notes, setNotes] = useState('');
   const [toast, setToast] = useState({ show: false, message: '', type: 'default' });
+  const [orderSuccess, setOrderSuccess] = useState(null);
 
   // Cart handlers
   const handleRemoveItem = (idx) => setOrder(o => o.filter((_, i) => i !== idx));

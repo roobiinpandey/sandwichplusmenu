@@ -31,13 +31,8 @@ function App() {
 	const [showPlaceOrder, setShowPlaceOrder] = useState(false);
 	const [customerName, setCustomerName] = useState('');
 	const [notes, setNotes] = useState('');
-		const [toast, setToast] = useState({ show: false, message: '', type: 'default' });
-			const toastTimeoutRef = useRef(null);
-			const showToast = (message, type = 'default') => {
-				setToast({ show: true, message, type });
-				if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
-				toastTimeoutRef.current = setTimeout(() => setToast({ show: false, message: '', type: 'default' }), 3000);
-			};
+	const [toast, setToast] = useState({ show: false, message: '', type: 'default' });
+	const toastTimeoutRef = useRef(null);
 	// Order success state
 	const [orderSuccess, setOrderSuccess] = useState(null);
 
