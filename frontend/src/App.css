@@ -932,25 +932,26 @@ body[data-lang="ar"] .phone-input {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: rgba(244, 67, 54, 0.95);
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
   color: white;
-  padding: 16px 24px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 1.1rem;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-  backdrop-filter: blur(8px);
+  padding: 24px 36px;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 1.3rem;
+  box-shadow: 0 12px 40px rgba(42, 92, 69, 0.3), 0 4px 12px rgba(0,0,0,0.15);
+  backdrop-filter: blur(12px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
   z-index: 10000;
   text-align: center;
-  min-width: 200px;
-  max-width: 80vw;
+  min-width: 300px;
+  max-width: 85vw;
   animation: toastFadeIn 0.3s ease-out;
 }
 
 @keyframes toastFadeIn {
   from {
     opacity: 0;
-    transform: translate(-50%, -50%) scale(0.8);
+    transform: translate(-50%, -50%) scale(0.7);
   }
   to {
     opacity: 1;
@@ -960,22 +961,37 @@ body[data-lang="ar"] .phone-input {
 
 /* Toast variants */
 .toast.success {
-  background: rgba(76, 175, 80, 0.95);
+  background: linear-gradient(135deg, var(--accent) 0%, #43a047 100%);
+  box-shadow: 0 12px 40px rgba(76, 175, 80, 0.3), 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .toast.error {
-  background: rgba(244, 67, 54, 0.95);
+  background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+  box-shadow: 0 12px 40px rgba(244, 67, 54, 0.3), 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .toast.warning {
-  background: rgba(255, 152, 0, 0.95);
+  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+  box-shadow: 0 12px 40px rgba(255, 152, 0, 0.3), 0 4px 12px rgba(0,0,0,0.15);
 }
 
 /* Mobile toast adjustments */
 @media (max-width: 768px) {
   .toast {
-    font-size: 1rem;
-    padding: 14px 20px;
+    font-size: 1.15rem;
+    padding: 20px 28px;
     max-width: 90vw;
+    min-width: 280px;
+    border-radius: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .toast {
+    font-size: 1.05rem;
+    padding: 18px 24px;
+    max-width: 95vw;
+    min-width: 260px;
+    border-radius: 12px;
   }
 }
