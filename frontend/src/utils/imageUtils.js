@@ -23,7 +23,10 @@ export const getImageUrl = (imagePath) => {
   
   // If it starts with a slash, it's a relative path from the backend
   if (imagePath.startsWith('/')) {
-    return API_BASE_URL + imagePath;
+    const fullUrl = API_BASE_URL + imagePath;
+    // Add version parameter for cache control after API optimization
+    const separator = imagePath.includes('?') ? '&' : '?';
+    return fullUrl + separator + 'v=2025092301'; // Version for Sept 23, 2025 optimization
   }
   
   // Otherwise, assume it's just a filename and prepend the images path
