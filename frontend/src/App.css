@@ -925,3 +925,57 @@ body[data-lang="ar"] .phone-input {
   direction: ltr;
   text-align: right;
 }
+
+/* Toast Notification Styling */
+.toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 152, 0, 0.95);
+  color: white;
+  padding: 16px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  backdrop-filter: blur(8px);
+  z-index: 10000;
+  text-align: center;
+  min-width: 200px;
+  max-width: 80vw;
+  animation: toastFadeIn 0.3s ease-out;
+}
+
+@keyframes toastFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Toast variants */
+.toast.success {
+  background: rgba(76, 175, 80, 0.95);
+}
+
+.toast.error {
+  background: rgba(244, 67, 54, 0.95);
+}
+
+.toast.warning {
+  background: rgba(255, 152, 0, 0.95);
+}
+
+/* Mobile toast adjustments */
+@media (max-width: 768px) {
+  .toast {
+    font-size: 1rem;
+    padding: 14px 20px;
+    max-width: 90vw;
+  }
+}

@@ -12,20 +12,6 @@ const API_BASE_URL = 'https://swp-backend-x36i.onrender.com';
 console.log('[DEBUG] MenuPage - Using API Base URL:', API_BASE_URL);
 axios.defaults.baseURL = API_BASE_URL;
 axios.defaults.withCredentials = false;
-// EmptyCartModal uses same style as OrderSummaryModal
-function EmptyCartModal({ show, lang, onClose }) {
-  if (!show) return null;
-  return (
-    <div className="modal fade-in" onClick={onClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <h2 style={{ textAlign: 'center', marginBottom: 18 }}>{lang === 'ar' ? 'سلة التسوق فارغة' : 'Your cart is empty.'}</h2>
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 18 }}>
-          <button onClick={onClose} style={{ background: '#d32f2f', color: '#fff', borderRadius: 6, padding: '8px 18px', fontWeight: 600, border: 'none', cursor: 'pointer' }}>{lang === 'ar' ? 'إغلاق' : 'Close'}</button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // Store Closed Modal
 function StoreClosedModal({ show, lang, onClose, storeStatus }) {
@@ -98,7 +84,6 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
   // Order modal states
   const [showPlaceOrder, setShowPlaceOrder] = useState(false);
   const [showCart, setShowCart] = useState(false);
-  const [showEmptyCartModal, setShowEmptyCartModal] = useState(false);
 
   // Load store status from backend
   useEffect(() => {
@@ -469,7 +454,12 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
           </button>
           <button className="order-btn place-order-btn" onClick={() => {
             if (order.length === 0) {
-              setShowEmptyCartModal(true);
+              setToast({ 
+                show: true, 
+                message: lang === 'ar' ? 'سلة التسوق فارغة' : 'Your cart is empty', 
+                type: 'warning' 
+              });
+              setTimeout(() => setToast({ show: false, message: '', type: 'default' }), 2000);
             } else {
               checkStoreStatusAndProceed(() => setShowPlaceOrder(true));
             }
@@ -479,9 +469,6 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
         </div>
         </div>
       </div>
-
-      {/* Empty Cart Modal - overlays above order summary bar */}
-      <EmptyCartModal show={showEmptyCartModal} lang={lang} onClose={() => setShowEmptyCartModal(false)} />
 
       {/* Modals */}
       <OrderSummaryModal
@@ -522,9 +509,9 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
         total={orderSuccess?.total || 0}
         onNewOrder={() => setOrderSuccess(null)}
       />
-      {/* Toast Notification: do not show for empty cart */}
-      {toast.show && toast.message && toast.message !== 'Your cart is empty' && toast.message !== 'سلة التسوق فارغة' && (
-        <div className="toast" style={{ opacity: 1 }}>
+      {/* Toast Notification - now includes empty cart messages */}
+      {toast.show && toast.message && (
+        <div className={`toast ${toast.type || 'default'}`} style={{ opacity: 1 }}>
           {toast.message}
         </div>
       )}
