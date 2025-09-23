@@ -202,6 +202,37 @@ function Dashboard() {
 
   return (
     <div className={`admin-dashboard${newOrderAnim ? ' new-order-anim' : ''}`}>
+      {/* Store Operation Hour & Toggle */}
+      <div style={{
+        marginTop: '100px',
+        marginBottom: '24px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '18px',
+        justifyContent: 'center',
+        background: '#fff',
+        borderRadius: '12px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+        padding: '18px 32px',
+        fontWeight: 600
+      }}>
+        <label htmlFor="store-open" style={{ fontWeight: 700 }}>Store Operation Hour:</label>
+        <input id="store-open" type="time" style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', fontWeight: 600 }} />
+        <span style={{ fontWeight: 700 }}>to</span>
+        <input id="store-close" type="time" style={{ padding: '8px', borderRadius: '6px', border: '1px solid #ccc', fontWeight: 600 }} />
+        <button id="store-toggle" style={{
+          background: '#2a5c45',
+          color: '#fff',
+          padding: '10px 24px',
+          borderRadius: '8px',
+          border: 'none',
+          fontWeight: '700',
+          fontSize: '1.1rem',
+          cursor: 'pointer',
+          boxShadow: '0 2px 8px rgba(42,92,69,0.15)',
+          marginLeft: '18px'
+        }}>Turn ON/OFF Orders</button>
+      </div>
       <div style={{ 
         position: 'fixed',
         top: 0,

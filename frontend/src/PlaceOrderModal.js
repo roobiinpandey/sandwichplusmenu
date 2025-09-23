@@ -128,43 +128,26 @@ export default function PlaceOrderModal({ show, order, lang, customerName, setCu
                 Name {nameError && <span style={{ color: '#d32f2f' }}>*Required</span>}
               </label>
               <input 
-                id="po-name" 
-                name="customerName" 
-                type="text" 
-                autoComplete="off" 
-                spellCheck={false} 
-                autoCapitalize="words" 
+                id="po-name"
+                name="customerName"
+                type="text"
+                autoComplete="off"
+                spellCheck={false}
+                autoCapitalize="words"
                 placeholder={nameError ? "Please enter your name" : "Enter your name"}
-                aria-label="Name" 
-                value={localName} 
+                aria-label="Name"
+                value={localName}
                 onChange={handleNameChange}
-                style={{ 
-                  padding: '10px 12px', 
-                  borderRadius: 8, 
+                style={{
+                  padding: '10px 12px',
+                  borderRadius: 8,
                   border: nameError ? '2px solid #d32f2f' : '1px solid #e6e6f0',
                   backgroundColor: nameError ? '#fff5f5' : 'white',
-                  fontSize: '1rem', 
+                  fontSize: '1rem',
                   marginTop: 2,
                   boxShadow: nameError ? '0 0 0 3px rgba(211, 47, 47, 0.1)' : 'none'
-                }} 
+                }}
               />
-              {nameError && (
-                <div style={{ 
-                  color: '#d32f2f', 
-                  fontSize: '0.875rem', 
-                  fontWeight: 500, 
-                  marginTop: 6,
-                  padding: '8px 12px',
-                  backgroundColor: '#fdf2f2',
-                  border: '1px solid #f5c2c7',
-                  borderRadius: 6,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6
-                }}>
-                  ⚠️ {lang === 'ar' ? 'يرجى إدخال اسمك' : 'Please enter your name'}
-                </div>
-              )}
             </div>
             <div style={{ marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
               <label style={{ fontWeight: 700, fontSize: '1rem' }}>Phone Number</label>
