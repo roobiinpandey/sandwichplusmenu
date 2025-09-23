@@ -214,6 +214,19 @@ background-color: rgba(255,255,255,0.1);
   border: 1px solid rgba(255,255,255,0.2);
 }
 
+/* Non-intrusive floating cart positioning */
+@media (min-width: 769px) {
+  .order-summary {
+    position: fixed !important;
+    right: 20px !important;
+    bottom: 20px !important;
+    left: auto !important;
+    transform: none !important;
+    width: 320px !important;
+    max-width: 320px !important;
+  }
+}
+
 /* Hide floating cart on mobile when keyboard is open */
 @media (max-width: 768px) and (max-height: 500px) {
   .order-summary {
@@ -227,7 +240,7 @@ background-color: rgba(255,255,255,0.1);
   margin-bottom: 20px;
 }
 
-/* Mobile Menu Container */
+/* Mobile Menu Container - reduced padding since cart is on side for desktop */
 @media (max-width: 768px) {
   .menu-container {
     padding: 16px 12px 110px; /* Extra bottom padding on mobile */
@@ -238,6 +251,9 @@ background-color: rgba(255,255,255,0.1);
     width: calc(100vw - 24px) !important;
     padding: 16px 14px !important;
     box-shadow: 0 2px 15px rgba(0,0,0,0.2) !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
   }
 }
 
@@ -253,8 +269,16 @@ background-color: rgba(255,255,255,0.1);
   }
 }
 
+/* Desktop menu container - no extra bottom padding since cart is on side */
+@media (min-width: 769px) {
+  .menu-container {
+    padding: 20px 15px 20px; /* Normal padding on desktop */
+  }
+}
+
+/* Mobile specific - only add bottom padding on mobile */
 .menu-container {
-padding: 20px 15px 100px; /* Increased bottom padding from 80px to 100px to account for floating cart */
+padding: 20px 15px 100px; /* Increased bottom padding from 80px to 100px to account for floating cart on mobile */
 min-height: 70vh;
 }
 .menu-section {

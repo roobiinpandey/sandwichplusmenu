@@ -99,6 +99,7 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
   const [showPlaceOrder, setShowPlaceOrder] = useState(false);
   const [showCart, setShowCart] = useState(false);
   const [showEmptyCartModal, setShowEmptyCartModal] = useState(false);
+  const [isCartCollapsed, setIsCartCollapsed] = useState(false);
 
   // Load store status from backend
   useEffect(() => {
