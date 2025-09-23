@@ -174,10 +174,7 @@ export default function MenuPage({ categories, lang, order, setOrder, addToCart,
   const handlePlaceOrder = async (payload = {}) => {
     try { console.log('[TRACE] MenuPage.handlePlaceOrder called', payload); } catch (e) {}
     const nameToUse = payload.customer || customerName;
-    if (!nameToUse.trim()) {
-      setToast({ show: true, message: lang === 'ar' ? 'يرجى إدخال اسمك' : 'Please enter your name', type: 'error' });
-      return;
-    }
+    // Note: Name validation is now handled inline in PlaceOrderModal
     try {
       const orderData = {
         customer: nameToUse,
