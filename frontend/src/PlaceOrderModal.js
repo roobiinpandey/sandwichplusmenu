@@ -63,7 +63,7 @@ export default function PlaceOrderModal({ show, order, lang, customerName, setCu
   };
   if (!show) return null;
   const accentColor = '#2a5c45';
-  const isFormValid = localName.trim().length > 0 && order.length > 0;
+  const isFormValid = order.length > 0; // Always enable button if cart has items, validation on click
   return (
     <div className="modal fade-in" onClick={onCancel} style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, background: 'rgba(0,0,0,0.18)' }}>
       <div className="modal-content" onClick={e => e.stopPropagation()} style={{ minWidth: 340, maxWidth: '95vw', background: '#fff', borderRadius: 22, boxShadow: '0 8px 32px rgba(0,0,0,0.18)', padding: 0, overflow: 'hidden', position: 'relative', fontFamily: 'inherit' }}>
